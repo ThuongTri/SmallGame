@@ -50,3 +50,4 @@ public class SimpleFPSController : MonoBehaviour
         controller.Move(velocity * Time.deltaTime);
     }
 }
+// commit dau tien
