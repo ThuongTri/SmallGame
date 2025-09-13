@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "D:\\lamgame1siu\\First\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\lamgame1siu\\First\\Assets\\Scenes\\oke.cs||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Assets\\Scenes\\oke.cs||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\lamgame1siu\\First\\Assets\\SimpleFPSController.cs||{3B902123-F8A7-4915-9F01-361F908088D0}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Assets\\SimpleFPSController.cs||{3B902123-F8A7-4915-9F01-361F908088D0}"
     },
@@ -18,32 +22,46 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "SimpleFPSController.cs",
-              "DocumentMoniker": "D:\\lamgame1siu\\First\\Assets\\SimpleFPSController.cs",
-              "RelativeDocumentMoniker": "Assets\\SimpleFPSController.cs",
-              "ToolTip": "D:\\lamgame1siu\\First\\Assets\\SimpleFPSController.cs",
-              "RelativeToolTip": "Assets\\SimpleFPSController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-10T07:12:23.744Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "MouseLook.cs",
               "DocumentMoniker": "D:\\lamgame1siu\\First\\Assets\\MouseLook.cs",
               "RelativeDocumentMoniker": "Assets\\MouseLook.cs",
               "ToolTip": "D:\\lamgame1siu\\First\\Assets\\MouseLook.cs",
               "RelativeToolTip": "Assets\\MouseLook.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB4AAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAhAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-09-10T07:08:39.853Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "oke.cs",
+              "DocumentMoniker": "D:\\lamgame1siu\\First\\Assets\\Scenes\\oke.cs",
+              "RelativeDocumentMoniker": "Assets\\Scenes\\oke.cs",
+              "ToolTip": "D:\\lamgame1siu\\First\\Assets\\Scenes\\oke.cs",
+              "RelativeToolTip": "Assets\\Scenes\\oke.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-13T05:52:13.873Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "SimpleFPSController.cs",
+              "DocumentMoniker": "D:\\lamgame1siu\\First\\Assets\\SimpleFPSController.cs",
+              "RelativeDocumentMoniker": "Assets\\SimpleFPSController.cs",
+              "ToolTip": "D:\\lamgame1siu\\First\\Assets\\SimpleFPSController.cs",
+              "RelativeToolTip": "Assets\\SimpleFPSController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-10T07:12:23.744Z",
               "EditorCaption": ""
             }
           ]
