@@ -1,23 +1,22 @@
-// File: FlashlightController.cs
 using UnityEngine;
 using System.Collections;
+
 public class FlashlightController : MonoBehaviour
 {
     [Tooltip("Light component (Spot) of the player's flashlight")]
     public Light flashlight;
 
     [Header("Usage timing (seconds)")]
-    public Vector2 lightDurationRange = new Vector2(5f, 7f); // random between
-    public float flickerDuration = 2f; // tổng thời gian chập chờn trước khi tắt
-    public Vector2 flickerIntervalRange = new Vector2(0.3f, 1f); // interval random trong lúc flicker
+    public Vector2 lightDurationRange = new Vector2(5f, 7f);
+    public float flickerDuration = 2f;
+    public Vector2 flickerIntervalRange = new Vector2(0.3f, 1f);
 
-    bool canUse = false;   // chỉ cho bật khi đã pick up
-    bool isOn = false;
-    Coroutine cycleCoroutine;
+    private bool canUse = false;   // chỉ bật khi đã nhặt
+    private bool isOn = false;
+    private Coroutine cycleCoroutine;
 
     void Awake()
     {
-        // tự tìm Light nếu chưa gán
         if (flashlight == null)
             flashlight = GetComponentInChildren<Light>();
     }
@@ -30,6 +29,7 @@ public class FlashlightController : MonoBehaviour
 
     void Update()
     {
+        // ❌ Chỉ cho phép bật đèn SAU KHI nhặt
         if (!canUse) return;
 
         if (Input.GetKeyDown(KeyCode.F))
@@ -43,10 +43,9 @@ public class FlashlightController : MonoBehaviour
 
     public void ActivateFlashlight()
     {
-        canUse = true;
+        canUse = true;   // ✅ Chỉ được bật sau khi nhặt
     }
 
-    // bật và khởi chu trình: sáng bình thường -> flicker -> tắt
     void TurnOn()
     {
         if (cycleCoroutine != null) StopCoroutine(cycleCoroutine);
@@ -66,11 +65,9 @@ public class FlashlightController : MonoBehaviour
         isOn = true;
         if (flashlight != null) flashlight.enabled = true;
 
-        // sáng bình thường (random trong range)
         float normalDuration = Random.Range(lightDurationRange.x, lightDurationRange.y);
         yield return new WaitForSeconds(normalDuration);
 
-        // flicker phase
         float elapsed = 0f;
         while (elapsed < flickerDuration)
         {
@@ -80,13 +77,11 @@ public class FlashlightController : MonoBehaviour
             elapsed += iv;
         }
 
-        // ensure off at end
         if (flashlight != null) flashlight.enabled = false;
         isOn = false;
         cycleCoroutine = null;
     }
 
-    // Optionally reset the cycle so player can immediately turn on again (call if needed)
     public void ResetCycle()
     {
         if (cycleCoroutine != null) StopCoroutine(cycleCoroutine);

@@ -1,48 +1,50 @@
 using UnityEngine;
 using TMPro;
+
 public class FlashlightPickup : MonoBehaviour, IInteractable
 {
-    [Tooltip("Drag the Player's flashlight GameObject (child of Camera) here")]
-    public GameObject playerFlashlight;
-
-    [Tooltip("Drag the FlashlightText (TMP UI) từ Canvas vào đây")]
+    public GameObject playerFlashlight; 
     public TextMeshProUGUI flashlightText;
 
     public void OnInteract()
     {
         if (playerFlashlight != null)
         {
-            // Bật flashlight trên Player (gắn với Camera)
-            playerFlashlight.SetActive(true);
-
-            // Nếu có FlashlightController thì cho phép bật/tắt bằng F
-            var controller = playerFlashlight.GetComponent<FlashlightController>();
-            if (controller != null)
+            // Kích hoạt PlayerFlashlight
+            var playerFlashlightScript = playerFlashlight.GetComponent<PlayerFlashlight>();
+            if (playerFlashlightScript != null)
             {
-                controller.ActivateFlashlight();
+                playerFlashlightScript.UnlockFlashlight();
+            }
+            
+            // Kích hoạt FlashlightController
+            var flashlightController = playerFlashlight.GetComponent<FlashlightController>();
+            if (flashlightController != null)
+            {
+                flashlightController.ActivateFlashlight();
             }
         }
 
-        // Hiện gợi ý "Ấn F để bật đèn pin"
-        if (flashlightText != null)
-        {
-            flashlightText.text = "Press F";
-            flashlightText.gameObject.SetActive(true);
+		if (flashlightText != null)
+		{
+			flashlightText.text = "Press F";
+			flashlightText.gameObject.SetActive(true);
+		}
 
-            // Tắt sau 3 giây
-            flashlightText.GetComponent<MonoBehaviour>().StartCoroutine(HideTextAfterDelay());
-        }
-
-        // Xóa object đèn pin dưới đất
-        Destroy(gameObject);
+		StartCoroutine(PickupSequence());
     }
 
-    private System.Collections.IEnumerator HideTextAfterDelay()
-    {
-        yield return new WaitForSeconds(3f);
-        if (flashlightText != null)
-        {
-            flashlightText.gameObject.SetActive(false);
-        }
-    }
+	private System.Collections.IEnumerator PickupSequence()
+	{
+		// Ngăn tương tác lại ngay lập tức
+		var colliders = GetComponentsInChildren<Collider>();
+		for (int i = 0; i < colliders.Length; i++) colliders[i].enabled = false;
+		var renderers = GetComponentsInChildren<Renderer>();
+		for (int i = 0; i < renderers.Length; i++) renderers[i].enabled = false;
+
+		// Chờ 3 giây rồi ẩn chữ và hủy object
+		yield return new WaitForSeconds(3f);
+		if (flashlightText != null) flashlightText.gameObject.SetActive(false);
+		Destroy(gameObject);
+	}
 }
