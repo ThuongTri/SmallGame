@@ -57,15 +57,10 @@ public class MonsterAI : MonoBehaviour {
     void Start(){
         agent.speed = patrolSpeed;
         GoNextWaypoint();
-      //  NoiseEmitter.OnNoise += OnNoiseHeard;
     }
 
-  //  void OnDestroy(){
-   //     NoiseEmitter.OnNoise -= OnNoiseHeard;
-  //  }
-
     void Update(){
-        UpdateEmissionBob(); // visual bob
+        UpdateEmissionBob(); // visual bobbing effect for glowing belly
         switch(state){
             case State.Patrol: PatrolUpdate(); break;
             case State.Stalk: StalkUpdate(); break;
@@ -73,6 +68,7 @@ public class MonsterAI : MonoBehaviour {
             case State.Search: /*Search handled in coroutine*/ break;
         }
 
+        // Vision check: if monster can see the player -> chase
         if (CanSeePlayer()){
             lastSighting = player.position;
             EnterState(State.Chase);
@@ -86,13 +82,13 @@ public class MonsterAI : MonoBehaviour {
 
     void StalkUpdate(){
         agent.speed = Mathf.Lerp(agent.speed, stalkSpeed, Time.deltaTime*2f);
-        // maintain distance behind / to the side
+        // maintain distance behind / to the side of player
         Vector3 dir = (player.position - transform.position).normalized;
         Vector3 target = player.position - dir * ((stalkMinDist + stalkMaxDist) * 0.5f);
         agent.SetDestination(target);
 
         // occasionally mimic voice or whisper
-        if (!audioSource.isPlaying && Random.value < 0.002f * (1f + aggression*5f)) {
+        if (!audioSource.isPlaying && UnityEngine.Random.value < 0.002f * (1f + aggression*5f)) {
             PlayWhisperOrMimic();
         }
     }
@@ -118,21 +114,31 @@ public class MonsterAI : MonoBehaviour {
         float angle = Vector3.Angle(transform.forward, dir.normalized);
         if (angle > viewAngle * 0.5f) return false;
         if (Physics.Raycast(eye, dir.normalized, out RaycastHit hit, dist, ~visionMask)) {
-            // if ray hits something not player, can't see
+            // if ray hits something that is not the player -> can't see player
             if (hit.transform != player && !hit.transform.IsChildOf(player)) return false;
-        } else {
-            // no hit? assume visible (rare)
         }
         return true;
     }
 
+    /// <summary>
+    /// Called when noise is detected (from NoiseEmitter).
+    /// Noise loudness is scaled by hearingMultiplier and compared with distance.
+    /// </summary>
     void OnNoiseHeard(Vector3 pos, float loudness){
-        // loudness in arbitrary units. hearing = base + loudness * multiplier
         float hearingRange = hearingBase + loudness * hearingMultiplier;
         if (Vector3.Distance(transform.position, pos) <= hearingRange){
             lastSighting = pos;
             EnterState(State.Stalk);
         }
+    }
+
+    /// <summary>
+    /// Public wrapper so PlayerNoiseEmitter can directly call this.
+    /// </summary>
+    public void OnHearNoise(Vector3 pos){
+        // Forward call with default loudness = 1.0f
+        OnNoiseHeard(pos, 1.0f);
+        Debug.Log(name + " heard noise at " + pos);
     }
 
     void EnterState(State next){
@@ -153,7 +159,6 @@ public class MonsterAI : MonoBehaviour {
             Vector3 offset = new Vector3(Mathf.Sin(t*1.2f),0, Mathf.Cos(t*1.2f)) * 3f;
             agent.SetDestination(lastSighting + offset);
             t += Time.deltaTime;
-            // if sees player break
             if (CanSeePlayer()){
                 EnterState(State.Chase);
                 yield break;
@@ -165,32 +170,30 @@ public class MonsterAI : MonoBehaviour {
     }
 
     void PlayWhisperOrMimic(){
-        if (mimicVoiceClip != null && aggression > 0.6f && Random.value < 0.6f) {
+        if (mimicVoiceClip != null && aggression > 0.6f && UnityEngine.Random.value < 0.6f) {
             audioSource.PlayOneShot(mimicVoiceClip);
         } else if (whisperClips != null && whisperClips.Length > 0) {
-            audioSource.PlayOneShot(whisperClips[Random.Range(0, whisperClips.Length)]);
+            audioSource.PlayOneShot(whisperClips[UnityEngine.Random.Range(0, whisperClips.Length)]);
         }
     }
 
-    // Visual: emission bobbing
+    // Visual: emission bobbing effect
     void UpdateEmissionBob(){
         if (bellyRenderer==null) return;
         Material mat = bellyRenderer.material;
         float t = Time.time * bobSpeed;
         float emission = emissionBase + Mathf.Abs(Mathf.Sin(t)) * bobAmount * (1f + aggression*3f);
         emission = Mathf.Lerp(emission, Mathf.Lerp(emissionBase, emissionMax, aggression), 0.5f);
-        Color baseColor = Color.red; // tune in inspector by making material parametric
+        Color baseColor = Color.red; 
         if (mat.HasProperty("_EmissionColor")) {
             mat.EnableKeyword("_EMISSION");
             mat.SetColor("_EmissionColor", baseColor * emission);
         }
     }
 
-    // SafeZone hook called by SafeZone script
+    // Called by SafeZone script when monster enters safe zone
     public void OnEnterSafeZone(){
-        // calm down
         aggression = Mathf.Max(0f, aggression - 0.4f);
-        // retreat a bit
         EnterState(State.Patrol);
     }
 
@@ -198,7 +201,6 @@ public class MonsterAI : MonoBehaviour {
         aggression = Mathf.Clamp01(aggression + delta);
     }
 
-    // Debug gizmos
     void OnDrawGizmosSelected(){
         if (!drawGizmos) return;
         Gizmos.color = Color.yellow;
