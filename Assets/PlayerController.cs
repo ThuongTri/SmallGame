@@ -4,33 +4,33 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement Settings")]
-    public float walkSpeed = 3f;      // Tốc độ đi bộ
-    public float runSpeed = 9f;       // Tốc độ chạy
-    public float lookSensitivity = 2f;// Độ nhạy chuột
-    public float gravity = -9.81f;    // Trọng lực
+    public float walkSpeed = 3f;      
+    public float runSpeed = 9f;       
+    public float lookSensitivity = 2f;
+    public float gravity = -9.81f;    
 
     [Header("Camera")]
-    public Transform cameraTransform; // Camera gắn vào player
+    public Transform cameraTransform; 
 
     [Header("Stamina Settings")]
-    public float maxStamina = 5f;     // Thời gian chạy tối đa (giây)
-    public float staminaRegenRate = 1f; // Tốc độ hồi stamina mỗi giây
-    private float stamina;            // Giá trị stamina hiện tại
+    public float maxStamina = 5f;     
+    public float staminaRegenRate = 1f; 
+    private float stamina;            
+    private bool exhausted = false;   
 
     [Header("Breathing Sounds")]
-    public AudioSource breathingAudio; // Gắn audio source vào Player
-    public AudioClip heavyBreathing;   // Âm thở gấp khi kiệt sức
+    public AudioSource breathingAudio;
+    public AudioClip heavyBreathing;  
 
     private CharacterController controller;
-    private float verticalVelocity;    // Tốc độ rơi
-    private float cameraPitch = 0f;    // Góc nhìn dọc
-    private bool exhausted = false;    // Có bị kiệt sức không?
+    private float verticalVelocity;   
+    private float cameraPitch = 0f;   
 
     void Start()
     {
         controller = GetComponent<CharacterController>();
-        Cursor.lockState = CursorLockMode.Locked; // Khóa chuột
-        stamina = maxStamina; // Khởi tạo stamina đầy
+        Cursor.lockState = CursorLockMode.Locked; 
+        stamina = maxStamina; 
     }
 
     void Update()
@@ -42,46 +42,59 @@ public class PlayerController : MonoBehaviour
 
     void Move()
     {
-        float moveX = Input.GetAxis("Horizontal"); // A/D
-        float moveZ = Input.GetAxis("Vertical");   // W/S
+        float moveX = Input.GetAxis("Horizontal"); 
+        float moveZ = Input.GetAxis("Vertical");   
 
         bool wantsToRun = Input.GetKey(KeyCode.LeftShift) && (moveX != 0 || moveZ != 0);
 
         // --- Logic stamina ---
         if (wantsToRun && stamina > 0 && !exhausted)
         {
-            stamina -= Time.deltaTime; // Giảm stamina khi chạy
+            stamina -= Time.deltaTime; 
             if (stamina <= 0)
             {
                 stamina = 0;
-                exhausted = true; // Khi chạm 0 thì kiệt sức
+                exhausted = true; 
             }
         }
         else
         {
-            // Hồi stamina khi không chạy
             stamina += staminaRegenRate * Time.deltaTime;
             if (stamina >= maxStamina)
             {
                 stamina = maxStamina;
-                exhausted = false; // Đầy lại thì hết kiệt sức
+                exhausted = false; 
             }
         }
 
-        // Tốc độ tùy theo stamina
         float currentSpeed = (wantsToRun && !exhausted) ? runSpeed : walkSpeed;
 
-        // --- Movement ---
         Vector3 move = transform.right * moveX + transform.forward * moveZ;
 
         if (controller.isGrounded)
-            verticalVelocity = -1f; // Giữ player dính đất
+            verticalVelocity = -1f; 
         else
             verticalVelocity += gravity * Time.deltaTime;
 
         move.y = verticalVelocity;
 
+        // Di chuyển
         controller.Move(move * currentSpeed * Time.deltaTime);
+
+        // ----------------------------
+        // 🔊 Gọi NoiseEmitter ở đây
+        // ----------------------------
+        if (moveX != 0 || moveZ != 0) 
+        {
+            if (wantsToRun && !exhausted)
+            {
+                NoiseEmitter.EmitNoise(transform.position, 1.4f); // chạy
+            }
+            else
+            {
+                NoiseEmitter.EmitNoise(transform.position, 0.6f); // đi bộ
+            }
+        }
     }
 
     void Look()
@@ -89,10 +102,8 @@ public class PlayerController : MonoBehaviour
         float mouseX = Input.GetAxis("Mouse X") * lookSensitivity;
         float mouseY = Input.GetAxis("Mouse Y") * lookSensitivity;
 
-        // Xoay player trái/phải
         transform.Rotate(Vector3.up * mouseX);
 
-        // Xoay camera lên/xuống
         cameraPitch -= mouseY;
         cameraPitch = Mathf.Clamp(cameraPitch, -80f, 80f);
         cameraTransform.localRotation = Quaternion.Euler(cameraPitch, 0f, 0f);
@@ -105,10 +116,12 @@ public class PlayerController : MonoBehaviour
             breathingAudio.clip = heavyBreathing;
             breathingAudio.loop = false;
             breathingAudio.Play();
+
+            // 🔊 Thở gấp cũng phát noise (quái nghe thấy)
+            NoiseEmitter.EmitNoise(transform.position, 0.8f);
         }
     }
 
-    // --- Getter cho stamina (dùng nếu sau này muốn UI hiển thị) ---
     public float GetStaminaPercent()
     {
         return stamina / maxStamina;

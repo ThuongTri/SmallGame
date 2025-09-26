@@ -1,7 +1,6 @@
 // File: FlashlightController.cs
 using UnityEngine;
 using System.Collections;
-
 public class FlashlightController : MonoBehaviour
 {
     [Tooltip("Light component (Spot) of the player's flashlight")]

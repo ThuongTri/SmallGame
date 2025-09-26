@@ -1,5 +1,4 @@
 using UnityEngine;
-
 public class PlayerFlashlight : MonoBehaviour
 {
     public Light flashlight; // <- Cái này bị thiếu assign trong Inspector

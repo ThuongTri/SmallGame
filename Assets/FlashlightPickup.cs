@@ -1,6 +1,5 @@
 using UnityEngine;
 using TMPro;
-
 public class FlashlightPickup : MonoBehaviour, IInteractable
 {
     [Tooltip("Drag the Player's flashlight GameObject (child of Camera) here")]

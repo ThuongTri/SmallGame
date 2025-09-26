@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-
 public class PlayerInteract : MonoBehaviour
 {
     [Header("Cài đặt tương tác")]
