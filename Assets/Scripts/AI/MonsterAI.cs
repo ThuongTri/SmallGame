@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
 
+[RequireComponent(typeof(UnityEngine.AudioSource))]
 public class MonsterAI : MonoBehaviour {
     public enum State { Patrol, Stalk, Chase, Search }
     public State state = State.Patrol;
@@ -52,6 +53,11 @@ public class MonsterAI : MonoBehaviour {
     void Awake(){
         if (agent==null) agent = GetComponent<NavMeshAgent>();
         audioSource = GetComponent<AudioSource>();
+        if (audioSource == null) {
+            audioSource = gameObject.AddComponent<AudioSource>();
+            audioSource.playOnAwake = false;
+            audioSource.spatialBlend = 1f;
+        }
     }
 
     void Start(){
@@ -88,7 +94,12 @@ public class MonsterAI : MonoBehaviour {
         agent.SetDestination(target);
 
         // occasionally mimic voice or whisper
-        if (!audioSource.isPlaying && UnityEngine.Random.value < 0.002f * (1f + aggression*5f)) {
+        // Tuning:
+        // - Base random frequency: 0.002f per frame (~0.12/sec at 60 FPS)
+        // - Scales with aggression (1 + aggression*5f)
+        //   => At aggression=0.8, multiplier ~5.0 -> ~0.6/sec.
+        // - Guard: only when not already playing.
+        if (audioSource != null && !audioSource.isPlaying && UnityEngine.Random.value < 0.002f * (1f + aggression*5f)) {
             PlayWhisperOrMimic();
         }
     }
@@ -170,6 +181,9 @@ public class MonsterAI : MonoBehaviour {
     }
 
     void PlayWhisperOrMimic(){
+        // Tuning:
+        // - If aggression high (>0.6) there is 60% chance to play mimic voice.
+        // - Otherwise or if blocked, fallback to a random whisper clip.
         if (mimicVoiceClip != null && aggression > 0.6f && UnityEngine.Random.value < 0.6f) {
             audioSource.PlayOneShot(mimicVoiceClip);
         } else if (whisperClips != null && whisperClips.Length > 0) {

@@ -22,9 +22,16 @@ public class PlayerController : MonoBehaviour
     public AudioSource breathingAudio;
     public AudioClip heavyBreathing;  
 
+    [Header("Directors")]
+    public GameDirector gameDirector; // optional: report sprinting to dynamic difficulty
+
     private CharacterController controller;
     private float verticalVelocity;   
     private float cameraPitch = 0f;   
+
+    // Sprint reporting state
+    private bool wasSprinting = false;
+    private float sprintAccumulatedSeconds = 0f;
 
     void Start()
     {
@@ -66,6 +73,31 @@ public class PlayerController : MonoBehaviour
                 exhausted = false; 
             }
         }
+
+        // --- Report sprint to GameDirector ---
+        bool isSprinting = wantsToRun && !exhausted;
+        if (isSprinting)
+        {
+            // accumulate sprint time while sprinting
+            sprintAccumulatedSeconds += Time.deltaTime;
+            // call once on sprint start (small nudge)
+            if (!wasSprinting && gameDirector != null)
+            {
+                gameDirector.OnPlayerSprinted(0.2f);
+            }
+            // if sprinting for at least 0.5s, report chunk and reset accumulator
+            if (sprintAccumulatedSeconds >= 0.5f && gameDirector != null)
+            {
+                gameDirector.OnPlayerSprinted(sprintAccumulatedSeconds);
+                sprintAccumulatedSeconds = 0f;
+            }
+        }
+        else
+        {
+            // reset accumulation when player stops sprinting
+            sprintAccumulatedSeconds = 0f;
+        }
+        wasSprinting = isSprinting;
 
         float currentSpeed = (wantsToRun && !exhausted) ? runSpeed : walkSpeed;
 
