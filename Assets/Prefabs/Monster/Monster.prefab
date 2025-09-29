@@ -186,7 +186,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c9042d7d10d3a749890cc5ad0e00c5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  silhouettePrefab: {fileID: 3416269096930444913, guid: de3037cfb4ab4b941a9215be6e275b2f, type: 3}
+  silhouettePrefab: {fileID: 8092086756895830378, guid: a1e7d3be9e66ff34d8908057389da193, type: 3}
   scareSounds:
   - {fileID: 8300000, guid: b8dc7330d4eb5f84a9fbc2e5d2b165f7, type: 3}
   - {fileID: 8300000, guid: 400edcee17d2343408569d9ac26d04a2, type: 3}

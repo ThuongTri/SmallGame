@@ -33,6 +33,12 @@ public class GameDirector : MonoBehaviour {
 
         // Push delta to monster
         monster.AdjustAggression(aggression - monster.aggression);
+        
+        // Debug aggression
+        if (Time.frameCount % 60 == 0) // Log mỗi giây
+        {
+            Debug.Log($"GameDirector: aggression={aggression}, monster.aggression={monster.aggression}, distance={dist:F1}m");
+        }
     }
 
     /// <summary>
@@ -41,6 +47,7 @@ public class GameDirector : MonoBehaviour {
     /// </summary>
     public void OnPlayerSprinted(float secs){
         aggression = Mathf.Clamp01(aggression + runIncrease * Mathf.Max(0f, secs));
+        Debug.Log($"Player sprinted for {secs}s, aggression now: {aggression}");
     }
 
     /// <summary>
@@ -48,7 +55,6 @@ public class GameDirector : MonoBehaviour {
     /// </summary>
     public void OnLorePicked(bool major){
         aggression = Mathf.Clamp01(aggression + (major ? 0.14f : 0.05f));
+        Debug.Log($"Lore picked up (major={major}), aggression now: {aggression}");
     }
 }
-
-
