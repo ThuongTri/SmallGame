@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &4686020679902380746
+--- !u!1 &3374836263925818468
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,41 +8,46 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 4899397036924643585}
-  - component: {fileID: 2215995159060442075}
+  - component: {fileID: 61854712313181929}
+  - component: {fileID: 8922891392982951400}
   m_Layer: 0
-  m_Name: JumpscareTimer
+  m_Name: GameDirector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4899397036924643585
+--- !u!4 &61854712313181929
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4686020679902380746}
+  m_GameObject: {fileID: 3374836263925818468}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -60.51035, y: 3.829231, z: 40.727478}
+  m_LocalPosition: {x: -66.85503, y: 17.063442, z: 53.99072}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2215995159060442075
+--- !u!114 &8922891392982951400
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4686020679902380746}
+  m_GameObject: {fileID: 3374836263925818468}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5971289fb2392714aad597b8f9b0b954, type: 3}
+  m_Script: {fileID: 11500000, guid: db71f95761ba9a047818004f3e90e6d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spawner: {fileID: 0}
-  interval: 4
+  monster: {fileID: 0}
+  player: {fileID: 0}
+  aggression: 0
+  decayRate: 0.08
+  nearIncrease: 0.7
+  runIncrease: 0.12
+  nearThreshold: 12
