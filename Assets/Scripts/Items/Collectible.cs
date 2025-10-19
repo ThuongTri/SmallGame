@@ -1,23 +1,38 @@
 using UnityEngine;
 
-public class Collectible : MonoBehaviour
+public class Collectible : MonoBehaviour, IInteractable
 {
-    public string itemID;
-    public AudioClip pickupSound;
-    private bool isCollected = false;
+    [Header("Thông tin vật phẩm")]
+    public string ItemID;
+    public AudioClip PickupSound;
 
-    void OnTriggerEnter(Collider other)
+    [TextArea]
+    public string loreText;
+
+    public bool oneTimeCollect = true;
+    private bool collected = false;
+
+    public void OnInteract()
     {
-        if (other.CompareTag("Player"))   // ✅ nhớ đóng ngoặc
-        {
-            Collect();
-        }
+        if (oneTimeCollect && collected) return;
+
+        collected = true;
+
+        if (PickupSound)
+            AudioSource.PlayClipAtPoint(PickupSound, transform.position);
+
+        Debug.Log($"[Nhặt đồ] {ItemID} - {loreText}");
+
+        // 👉 Lưu vào hệ thống lore
+        if (LoreManager.Instance != null)
+            LoreManager.Instance.AddLore(ItemID, loreText);
+
+        // Ẩn vật phẩm sau khi nhặt
+        gameObject.SetActive(false);
     }
 
-    void Collect()
+    public string GetInteractionPrompt()
     {
-        AudioSource.PlayClipAtPoint(pickupSound, transform.position);
-        isCollected = true;
-        gameObject.SetActive(false);
+        return "Nhấn E để nhặt";
     }
 }
