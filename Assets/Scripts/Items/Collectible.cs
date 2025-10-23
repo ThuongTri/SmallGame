@@ -3,31 +3,30 @@ using UnityEngine;
 public class Collectible : MonoBehaviour, IInteractable
 {
     [Header("Thông tin vật phẩm")]
-    public string ItemID;
-    public AudioClip PickupSound;
+    public string itemID;              // ID duy nhất cho vật phẩm
+    public string itemName;            // Tên hiển thị
+    [TextArea(3, 6)]
+    public string loreText;            // Nội dung lore hiển thị
+    public Sprite icon;                // Icon vật phẩm
+    public AudioClip pickupSound;
 
-    [TextArea]
-    public string loreText;
-
+    [Header("Tùy chọn")]
     public bool oneTimeCollect = true;
     private bool collected = false;
 
     public void OnInteract()
     {
         if (oneTimeCollect && collected) return;
-
         collected = true;
 
-        if (PickupSound)
-            AudioSource.PlayClipAtPoint(PickupSound, transform.position);
+        if (pickupSound)
+            AudioSource.PlayClipAtPoint(pickupSound, transform.position);
 
-        Debug.Log($"[Nhặt đồ] {ItemID} - {loreText}");
+        Debug.Log($"[Nhặt đồ] {itemID}: {loreText}");
 
-        // 👉 Lưu vào hệ thống lore
         if (LoreManager.Instance != null)
-            LoreManager.Instance.AddLore(ItemID, loreText);
+            LoreManager.Instance.AddLore(itemID, itemName, loreText, icon);
 
-        // Ẩn vật phẩm sau khi nhặt
         gameObject.SetActive(false);
     }
 

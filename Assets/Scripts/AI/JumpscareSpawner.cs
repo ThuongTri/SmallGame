@@ -19,7 +19,7 @@ public class JumpscareSpawner : MonoBehaviour {
     [Header("References")]
     public Transform player;
     public MonsterAI monster;
-    
+
     [Header("Spawn Settings")]
     public bool use3D = true;                    // Ưu tiên 3D jumpscare
     public float minDist = 2f, maxDist = 4f;     // Khoảng cách trước mặt
@@ -141,10 +141,10 @@ public class JumpscareSpawner : MonoBehaviour {
         if (go != null)
         {
             yield return new WaitForSeconds(Random.Range(visibleDurationRange.x, visibleDurationRange.y));
-            Destroy(go);
-        }
+        Destroy(go);
     }
-    
+}
+
     /// <summary>
     /// Spawn 360 jumpscare xung quanh player
     /// </summary>
