@@ -1,0 +1,233 @@
+using UnityEngine;
+using UnityEngine.AI;
+using System.Collections;
+
+[RequireComponent(typeof(UnityEngine.AudioSource))]
+public class MonsterAI : MonoBehaviour {
+    public enum State { Patrol, Stalk, Chase, Search }
+    public State state = State.Patrol;
+
+    [Header("Core")]
+    public NavMeshAgent agent;
+    public Transform player;
+    public Transform[] waypoints;
+    int wpIndex = 0;
+
+    [Header("Senses")]
+    public float viewAngle = 100f;
+    public float viewDistance = 30f;
+    public LayerMask visionMask; // layers that block view (trees, rocks)
+    public float hearingBase = 6f; // base hearing radius
+    public float hearingMultiplier = 1f;
+
+    [Header("Speeds")]
+    public float patrolSpeed = 1.4f;
+    public float stalkSpeed = 2.2f;
+    public float chaseSpeed = 5.0f;
+
+    [Header("Stalk settings")]
+    public float stalkMinDist = 12f;
+    public float stalkMaxDist = 18f;
+    public AudioClip[] whisperClips;
+    public AudioClip mimicVoiceClip;
+    AudioSource audioSource;
+
+    [Header("Search")]
+    public float searchDuration = 8f;
+    Vector3 lastSighting;
+    Coroutine searchCoroutine;
+
+    [Header("Aggression")]
+    [Range(0f,1f)] public float aggression = 0f; // 0–1 from GameDirector
+
+    [Header("Visual")]
+    public Renderer bellyRenderer; // renderer for the glowing 'ruột' material
+    public float emissionBase = 1.2f;
+    public float emissionMax = 6f;
+    public float bobSpeed = 2f;
+    public float bobAmount = 0.12f;
+
+    [Header("Debug")]
+    public bool drawGizmos = true;
+
+    void Awake(){
+        if (agent==null) agent = GetComponent<NavMeshAgent>();
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null) {
+            audioSource = gameObject.AddComponent<AudioSource>();
+            audioSource.playOnAwake = false;
+            audioSource.spatialBlend = 1f;
+        }
+    }
+
+    void Start(){
+        agent.speed = patrolSpeed;
+        GoNextWaypoint();
+    }
+
+    void Update(){
+        UpdateEmissionBob(); // visual bobbing effect for glowing belly
+        switch(state){
+            case State.Patrol: PatrolUpdate(); break;
+            case State.Stalk: StalkUpdate(); break;
+            case State.Chase: ChaseUpdate(); break;
+            case State.Search: /*Search handled in coroutine*/ break;
+        }
+
+        // Vision check: if monster can see the player -> chase
+        if (CanSeePlayer()){
+            lastSighting = player.position;
+            EnterState(State.Chase);
+        }
+    }
+
+    void PatrolUpdate(){
+        agent.speed = Mathf.Lerp(agent.speed, patrolSpeed, Time.deltaTime*2f);
+        if (!agent.pathPending && agent.remainingDistance < 1f) GoNextWaypoint();
+    }
+
+    void StalkUpdate(){
+        agent.speed = Mathf.Lerp(agent.speed, stalkSpeed, Time.deltaTime*2f);
+        // maintain distance behind / to the side of player
+        Vector3 dir = (player.position - transform.position).normalized;
+        Vector3 target = player.position - dir * ((stalkMinDist + stalkMaxDist) * 0.5f);
+        agent.SetDestination(target);
+
+        // occasionally mimic voice or whisper
+        // Tuning:
+        // - Base random frequency: 0.002f per frame (~0.12/sec at 60 FPS)
+        // - Scales with aggression (1 + aggression*5f)
+        //   => At aggression=0.8, multiplier ~5.0 -> ~0.6/sec.
+        // - Guard: only when not already playing.
+        if (audioSource != null && !audioSource.isPlaying && UnityEngine.Random.value < 0.002f * (1f + aggression*5f)) {
+            PlayWhisperOrMimic();
+        }
+    }
+
+    void ChaseUpdate(){
+        agent.speed = Mathf.Lerp(agent.speed, Mathf.Lerp(chaseSpeed*0.9f, chaseSpeed, aggression), Time.deltaTime*2f);
+        agent.SetDestination(player.position);
+    }
+
+    void GoNextWaypoint(){
+        if (waypoints == null || waypoints.Length==0) return;
+        agent.SetDestination(waypoints[wpIndex].position);
+        wpIndex = (wpIndex + 1) % waypoints.Length;
+    }
+
+    bool CanSeePlayer(){
+        if (player == null) return false;
+        Vector3 eye = transform.position + Vector3.up * 1.6f;
+        Vector3 targetPos = player.position + Vector3.up * 1.0f; // player's torso/head
+        Vector3 dir = targetPos - eye;
+        float dist = dir.magnitude;
+        if (dist > viewDistance) return false;
+        float angle = Vector3.Angle(transform.forward, dir.normalized);
+        if (angle > viewAngle * 0.5f) return false;
+        if (Physics.Raycast(eye, dir.normalized, out RaycastHit hit, dist, ~visionMask)) {
+            // if ray hits something that is not the player -> can't see player
+            if (hit.transform != player && !hit.transform.IsChildOf(player)) return false;
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Called when noise is detected (from NoiseEmitter).
+    /// Noise loudness is scaled by hearingMultiplier and compared with distance.
+    /// </summary>
+    void OnNoiseHeard(Vector3 pos, float loudness){
+        float hearingRange = hearingBase + loudness * hearingMultiplier;
+        if (Vector3.Distance(transform.position, pos) <= hearingRange){
+            lastSighting = pos;
+            EnterState(State.Stalk);
+        }
+    }
+
+    /// <summary>
+    /// Public wrapper so PlayerNoiseEmitter can directly call this.
+    /// </summary>
+    public void OnHearNoise(Vector3 pos){
+        // Forward call with default loudness = 1.0f
+        OnNoiseHeard(pos, 1.0f);
+        Debug.Log(name + " heard noise at " + pos);
+    }
+
+    void EnterState(State next){
+        if (state == next) return;
+        state = next;
+        // cancel search coroutine if any
+        if (searchCoroutine != null){ StopCoroutine(searchCoroutine); searchCoroutine = null; }
+        if (state == State.Search){
+            searchCoroutine = StartCoroutine(DoSearch());
+        }
+    }
+
+    IEnumerator DoSearch(){
+        agent.SetDestination(lastSighting);
+        float t = 0f;
+        while(t < searchDuration){
+            // circle around lastSighting a bit
+            Vector3 offset = new Vector3(Mathf.Sin(t*1.2f),0, Mathf.Cos(t*1.2f)) * 3f;
+            agent.SetDestination(lastSighting + offset);
+            t += Time.deltaTime;
+            if (CanSeePlayer()){
+                EnterState(State.Chase);
+                yield break;
+            }
+            yield return null;
+        }
+        // give up -> patrol
+        EnterState(State.Patrol);
+    }
+
+    void PlayWhisperOrMimic(){
+        // Tuning:
+        // - If aggression high (>0.6) there is 60% chance to play mimic voice.
+        // - Otherwise or if blocked, fallback to a random whisper clip.
+        if (mimicVoiceClip != null && aggression > 0.6f && UnityEngine.Random.value < 0.6f) {
+            audioSource.PlayOneShot(mimicVoiceClip);
+        } else if (whisperClips != null && whisperClips.Length > 0) {
+            audioSource.PlayOneShot(whisperClips[UnityEngine.Random.Range(0, whisperClips.Length)]);
+        }
+    }
+
+    // Visual: emission bobbing effect
+    void UpdateEmissionBob(){
+        if (bellyRenderer==null) return;
+        Material mat = bellyRenderer.material;
+        float t = Time.time * bobSpeed;
+        float emission = emissionBase + Mathf.Abs(Mathf.Sin(t)) * bobAmount * (1f + aggression*3f);
+        emission = Mathf.Lerp(emission, Mathf.Lerp(emissionBase, emissionMax, aggression), 0.5f);
+        Color baseColor = Color.red; 
+        if (mat.HasProperty("_EmissionColor")) {
+            mat.EnableKeyword("_EMISSION");
+            mat.SetColor("_EmissionColor", baseColor * emission);
+        }
+    }
+
+    // Called by SafeZone script when monster enters safe zone
+    public void OnEnterSafeZone(){
+        aggression = Mathf.Max(0f, aggression - 0.4f);
+        EnterState(State.Patrol);
+    }
+
+    public void AdjustAggression(float delta){
+        aggression = Mathf.Clamp01(aggression + delta);
+    }
+
+    void OnDrawGizmosSelected(){
+        if (!drawGizmos) return;
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, hearingBase);
+        Gizmos.color = Color.red;
+        Vector3 eye = transform.position + Vector3.up * 1.6f;
+        Gizmos.DrawWireSphere(eye, viewDistance);
+        // draw FOV lines
+        Vector3 left = Quaternion.Euler(0, -viewAngle*0.5f, 0) * transform.forward;
+        Vector3 right = Quaternion.Euler(0, viewAngle*0.5f, 0) * transform.forward;
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawLine(eye, eye + left * viewDistance);
+        Gizmos.DrawLine(eye, eye + right * viewDistance);
+    }
+}
+// update quai vat lo roi
