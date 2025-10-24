@@ -1,11 +1,10 @@
 using UnityEngine;
 
-// InventoryToggle: bật/tắt panel inventory, khóa/mở chuột, vô hiệu hóa player control
 public class InventoryToggle : MonoBehaviour
 {
     public GameObject inventoryPanel;
     public CodexUI codexUI;
-    public string playerObjectName = "Player"; 
+    public string playerObjectName = "Player";
     public MonoBehaviour playerControllerComponent;
 
     private MonoBehaviour cachedPlayerController;
@@ -15,7 +14,6 @@ public class InventoryToggle : MonoBehaviour
         if (inventoryPanel != null) inventoryPanel.SetActive(false);
         if (codexUI != null) codexUI.HideTooltip();
 
-        // cache controller
         if (playerControllerComponent != null)
         {
             cachedPlayerController = playerControllerComponent;

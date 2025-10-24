@@ -3,11 +3,10 @@ using UnityEngine;
 public class Collectible : MonoBehaviour, IInteractable
 {
     [Header("Thông tin vật phẩm")]
-    public string itemID;              // ID duy nhất cho vật phẩm
-    public string itemName;            // Tên hiển thị
-    [TextArea(3, 6)]
-    public string loreText;            // Nội dung lore hiển thị
-    public Sprite icon;                // Icon vật phẩm
+    public string itemID;               // ID lore
+    public string itemTitle;            // Tên lore
+    [TextArea(3, 6)] public string loreText; // Mô tả lore
+    public Sprite itemIcon;
     public AudioClip pickupSound;
 
     [Header("Tùy chọn")]
@@ -22,10 +21,10 @@ public class Collectible : MonoBehaviour, IInteractable
         if (pickupSound)
             AudioSource.PlayClipAtPoint(pickupSound, transform.position);
 
-        Debug.Log($"[Nhặt đồ] {itemID}: {loreText}");
+        Debug.Log($"[Nhặt đồ] {itemID}: {itemTitle}");
 
         if (LoreManager.Instance != null)
-            LoreManager.Instance.AddLore(itemID, itemName, loreText, icon);
+            LoreManager.Instance.AddLore(itemID, itemTitle, loreText, itemIcon);
 
         gameObject.SetActive(false);
     }
