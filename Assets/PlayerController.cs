@@ -66,3 +66,4 @@ public class PlayerController : MonoBehaviour
         cameraTransform.localRotation = Quaternion.Euler(cameraPitch, 0f, 0f);
     }
 }
+//cap nhat controller nhan vat
