@@ -1075,7 +1075,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -1343,7 +1343,10 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 776d0d64b5f2d7f4ab1dba22f49d13d6, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1115971461}
+      addedObject: {fileID: 1115971465}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 776d0d64b5f2d7f4ab1dba22f49d13d6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1115971464}
   m_SourcePrefab: {fileID: 100100000, guid: 776d0d64b5f2d7f4ab1dba22f49d13d6, type: 3}
 --- !u!4 &1115971459 stripped
 Transform:
@@ -1355,7 +1358,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 776d0d64b5f2d7f4ab1dba22f49d13d6, type: 3}
   m_PrefabInstance: {fileID: 1115971458}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1115971461
+--- !u!114 &1115971464
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1364,15 +1367,35 @@ MonoBehaviour:
   m_GameObject: {fileID: 1115971460}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 05f27264bfcb5074386e7ef3e4ff1f90, type: 3}
+  m_Script: {fileID: 11500000, guid: 833c7b8ec922d1044aae15a75f83a4f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemID: 
-  itemTitle: 
-  loreText: 
-  itemIcon: {fileID: 0}
-  pickupSound: {fileID: 0}
-  oneTimeCollect: 1
+  requiredKeyID: rusty_key
+  doorAnimator: {fileID: 0}
+  unlockTrigger: Unlock
+  needKeyText: "C\u1EA7n ch\xECa kh\xF3a \u0111\u1EC3 m\u1EDF c\xE1nh c\u1EEDa."
+  openText: "C\xE1nh c\u1EEDa m\u1EDF ra..."
+--- !u!65 &1115971465
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1115971460}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 3.864354, y: 2.5152385, z: 0.3820011}
+  m_Center: {x: -0.00000013050717, y: 1.2576191, z: 0.000000039349487}
 --- !u!1 &1168427090
 GameObject:
   m_ObjectHideFlags: 0
@@ -1604,9 +1627,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c59c81560e44a384e9ebc796f7d87634, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bunkerWaypoint: {fileID: 0}
+  assembledMapSprite: {fileID: 0}
+  assembledMapID: assembled_map
+  assembledMapTitle: "B\u1EA3n \u0111\u1ED3 ho\xE0n ch\u1EC9nh"
+  toastPrefab: {fileID: 0}
+  toastParent: {fileID: 0}
   bunkerDoor: {fileID: 1115971460}
-  hintAudio: {fileID: 0}
+  openDoorAnimTrigger: Unlock
 --- !u!4 &1291555776
 Transform:
   m_ObjectHideFlags: 0
