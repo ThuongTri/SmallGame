@@ -32,7 +32,11 @@ public class Collectible : MonoBehaviour, IInteractable
         if (ObjectiveManager.Instance != null)
             ObjectiveManager.Instance.OnItemCollected(itemID);
 
-        Destroy(gameObject); // Giữ nguyên logic xoá vật phẩm
+        // ✅ Hiển thị thông báo lên màn hình
+        if (UIMessageManager.Instance != null)
+            UIMessageManager.Instance.ShowMessage("Bạn nhặt được " + itemTitle);
+
+        Destroy(gameObject); // Xoá vật phẩm sau khi nhặt
     }
 
     public string GetInteractionPrompt()

@@ -3,7 +3,8 @@ using UnityEngine.AI;
 using System.Collections;
 
 [RequireComponent(typeof(UnityEngine.AudioSource))]
-public class MonsterAI : MonoBehaviour {
+public class MonsterAI : MonoBehaviour
+{
     public enum State { Patrol, Stalk, Chase, Search }
     public State state = State.Patrol;
 
@@ -38,7 +39,7 @@ public class MonsterAI : MonoBehaviour {
     Coroutine searchCoroutine;
 
     [Header("Aggression")]
-    [Range(0f,1f)] public float aggression = 0f; // 0–1 from GameDirector
+    [Range(0f, 1f)] public float aggression = 0f; // 0–1 from GameDirector
 
     [Header("Visual")]
     public Renderer bellyRenderer; // renderer for the glowing 'ruột' material
@@ -50,24 +51,33 @@ public class MonsterAI : MonoBehaviour {
     [Header("Debug")]
     public bool drawGizmos = true;
 
-    void Awake(){
-        if (agent==null) agent = GetComponent<NavMeshAgent>();
+    // ✅ Thêm biến chống spam log
+    float lastHeardLogTime = -10f;
+
+    void Awake()
+    {
+        if (agent == null) agent = GetComponent<NavMeshAgent>();
         audioSource = GetComponent<AudioSource>();
-        if (audioSource == null) {
+        if (audioSource == null)
+        {
             audioSource = gameObject.AddComponent<AudioSource>();
             audioSource.playOnAwake = false;
             audioSource.spatialBlend = 1f;
         }
     }
 
-    void Start(){
+    void Start()
+    {
         agent.speed = patrolSpeed;
         GoNextWaypoint();
     }
 
-    void Update(){
+    void Update()
+    {
         UpdateEmissionBob(); // visual bobbing effect for glowing belly
-        switch(state){
+
+        switch (state)
+        {
             case State.Patrol: PatrolUpdate(); break;
             case State.Stalk: StalkUpdate(); break;
             case State.Chase: ChaseUpdate(); break;
@@ -75,156 +85,169 @@ public class MonsterAI : MonoBehaviour {
         }
 
         // Vision check: if monster can see the player -> chase
-        if (CanSeePlayer()){
+        if (CanSeePlayer())
+        {
             lastSighting = player.position;
             EnterState(State.Chase);
         }
     }
 
-    void PatrolUpdate(){
-        agent.speed = Mathf.Lerp(agent.speed, patrolSpeed, Time.deltaTime*2f);
+    void PatrolUpdate()
+    {
+        agent.speed = Mathf.Lerp(agent.speed, patrolSpeed, Time.deltaTime * 2f);
         if (!agent.pathPending && agent.remainingDistance < 1f) GoNextWaypoint();
     }
 
-    void StalkUpdate(){
-        agent.speed = Mathf.Lerp(agent.speed, stalkSpeed, Time.deltaTime*2f);
-        // maintain distance behind / to the side of player
+    void StalkUpdate()
+    {
+        agent.speed = Mathf.Lerp(agent.speed, stalkSpeed, Time.deltaTime * 2f);
         Vector3 dir = (player.position - transform.position).normalized;
         Vector3 target = player.position - dir * ((stalkMinDist + stalkMaxDist) * 0.5f);
         agent.SetDestination(target);
 
-        // occasionally mimic voice or whisper
-        // Tuning:
-        // - Base random frequency: 0.002f per frame (~0.12/sec at 60 FPS)
-        // - Scales with aggression (1 + aggression*5f)
-        //   => At aggression=0.8, multiplier ~5.0 -> ~0.6/sec.
-        // - Guard: only when not already playing.
-        if (audioSource != null && !audioSource.isPlaying && UnityEngine.Random.value < 0.002f * (1f + aggression*5f)) {
+        // Tuning whisper & mimic frequency
+        if (audioSource != null && !audioSource.isPlaying && UnityEngine.Random.value < 0.002f * (1f + aggression * 5f))
+        {
             PlayWhisperOrMimic();
         }
     }
 
-    void ChaseUpdate(){
-        agent.speed = Mathf.Lerp(agent.speed, Mathf.Lerp(chaseSpeed*0.9f, chaseSpeed, aggression), Time.deltaTime*2f);
+    void ChaseUpdate()
+    {
+        agent.speed = Mathf.Lerp(agent.speed, Mathf.Lerp(chaseSpeed * 0.9f, chaseSpeed, aggression), Time.deltaTime * 2f);
         agent.SetDestination(player.position);
     }
 
-    void GoNextWaypoint(){
-        if (waypoints == null || waypoints.Length==0) return;
+    void GoNextWaypoint()
+    {
+        if (waypoints == null || waypoints.Length == 0) return;
         agent.SetDestination(waypoints[wpIndex].position);
         wpIndex = (wpIndex + 1) % waypoints.Length;
     }
 
-    bool CanSeePlayer(){
+    bool CanSeePlayer()
+    {
         if (player == null) return false;
         Vector3 eye = transform.position + Vector3.up * 1.6f;
-        Vector3 targetPos = player.position + Vector3.up * 1.0f; // player's torso/head
+        Vector3 targetPos = player.position + Vector3.up * 1.0f;
         Vector3 dir = targetPos - eye;
         float dist = dir.magnitude;
         if (dist > viewDistance) return false;
         float angle = Vector3.Angle(transform.forward, dir.normalized);
         if (angle > viewAngle * 0.5f) return false;
-        if (Physics.Raycast(eye, dir.normalized, out RaycastHit hit, dist, ~visionMask)) {
-            // if ray hits something that is not the player -> can't see player
+        if (Physics.Raycast(eye, dir.normalized, out RaycastHit hit, dist, ~visionMask))
+        {
             if (hit.transform != player && !hit.transform.IsChildOf(player)) return false;
         }
         return true;
     }
 
-    /// <summary>
-    /// Called when noise is detected (from NoiseEmitter).
-    /// Noise loudness is scaled by hearingMultiplier and compared with distance.
-    /// </summary>
-    void OnNoiseHeard(Vector3 pos, float loudness){
+    void OnNoiseHeard(Vector3 pos, float loudness)
+    {
         float hearingRange = hearingBase + loudness * hearingMultiplier;
-        if (Vector3.Distance(transform.position, pos) <= hearingRange){
+        if (Vector3.Distance(transform.position, pos) <= hearingRange)
+        {
             lastSighting = pos;
             EnterState(State.Stalk);
         }
     }
 
-    /// <summary>
-    /// Public wrapper so PlayerNoiseEmitter can directly call this.
-    /// </summary>
-    public void OnHearNoise(Vector3 pos){
-        // Forward call with default loudness = 1.0f
+    /// ✅ Đã chỉnh lại để không spam log
+    public void OnHearNoise(Vector3 pos)
+    {
         OnNoiseHeard(pos, 1.0f);
-        Debug.Log(name + " heard noise at " + pos);
+
+        // Chỉ log mỗi 2 giây 1 lần
+        if (Time.time - lastHeardLogTime > 2f)
+        {
+            Debug.Log($"[{Time.time:F1}] {name} heard noise at {pos}");
+            lastHeardLogTime = Time.time;
+        }
     }
 
-    void EnterState(State next){
+    void EnterState(State next)
+    {
         if (state == next) return;
         state = next;
-        // cancel search coroutine if any
-        if (searchCoroutine != null){ StopCoroutine(searchCoroutine); searchCoroutine = null; }
-        if (state == State.Search){
+
+        if (searchCoroutine != null)
+        {
+            StopCoroutine(searchCoroutine);
+            searchCoroutine = null;
+        }
+        if (state == State.Search)
+        {
             searchCoroutine = StartCoroutine(DoSearch());
         }
     }
 
-    IEnumerator DoSearch(){
+    IEnumerator DoSearch()
+    {
         agent.SetDestination(lastSighting);
         float t = 0f;
-        while(t < searchDuration){
-            // circle around lastSighting a bit
-            Vector3 offset = new Vector3(Mathf.Sin(t*1.2f),0, Mathf.Cos(t*1.2f)) * 3f;
+        while (t < searchDuration)
+        {
+            Vector3 offset = new Vector3(Mathf.Sin(t * 1.2f), 0, Mathf.Cos(t * 1.2f)) * 3f;
             agent.SetDestination(lastSighting + offset);
             t += Time.deltaTime;
-            if (CanSeePlayer()){
+            if (CanSeePlayer())
+            {
                 EnterState(State.Chase);
                 yield break;
             }
             yield return null;
         }
-        // give up -> patrol
         EnterState(State.Patrol);
     }
 
-    void PlayWhisperOrMimic(){
-        // Tuning:
-        // - If aggression high (>0.6) there is 60% chance to play mimic voice.
-        // - Otherwise or if blocked, fallback to a random whisper clip.
-        if (mimicVoiceClip != null && aggression > 0.6f && UnityEngine.Random.value < 0.6f) {
+    void PlayWhisperOrMimic()
+    {
+        if (mimicVoiceClip != null && aggression > 0.6f && UnityEngine.Random.value < 0.6f)
+        {
             audioSource.PlayOneShot(mimicVoiceClip);
-        } else if (whisperClips != null && whisperClips.Length > 0) {
+        }
+        else if (whisperClips != null && whisperClips.Length > 0)
+        {
             audioSource.PlayOneShot(whisperClips[UnityEngine.Random.Range(0, whisperClips.Length)]);
         }
     }
 
-    // Visual: emission bobbing effect
-    void UpdateEmissionBob(){
-        if (bellyRenderer==null) return;
+    void UpdateEmissionBob()
+    {
+        if (bellyRenderer == null) return;
         Material mat = bellyRenderer.material;
         float t = Time.time * bobSpeed;
-        float emission = emissionBase + Mathf.Abs(Mathf.Sin(t)) * bobAmount * (1f + aggression*3f);
+        float emission = emissionBase + Mathf.Abs(Mathf.Sin(t)) * bobAmount * (1f + aggression * 3f);
         emission = Mathf.Lerp(emission, Mathf.Lerp(emissionBase, emissionMax, aggression), 0.5f);
-        Color baseColor = Color.red; 
-        if (mat.HasProperty("_EmissionColor")) {
+        Color baseColor = Color.red;
+        if (mat.HasProperty("_EmissionColor"))
+        {
             mat.EnableKeyword("_EMISSION");
             mat.SetColor("_EmissionColor", baseColor * emission);
         }
     }
 
-    // Called by SafeZone script when monster enters safe zone
-    public void OnEnterSafeZone(){
+    public void OnEnterSafeZone()
+    {
         aggression = Mathf.Max(0f, aggression - 0.4f);
         EnterState(State.Patrol);
     }
 
-    public void AdjustAggression(float delta){
+    public void AdjustAggression(float delta)
+    {
         aggression = Mathf.Clamp01(aggression + delta);
     }
 
-    void OnDrawGizmosSelected(){
+    void OnDrawGizmosSelected()
+    {
         if (!drawGizmos) return;
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, hearingBase);
         Gizmos.color = Color.red;
         Vector3 eye = transform.position + Vector3.up * 1.6f;
         Gizmos.DrawWireSphere(eye, viewDistance);
-        // draw FOV lines
-        Vector3 left = Quaternion.Euler(0, -viewAngle*0.5f, 0) * transform.forward;
-        Vector3 right = Quaternion.Euler(0, viewAngle*0.5f, 0) * transform.forward;
+        Vector3 left = Quaternion.Euler(0, -viewAngle * 0.5f, 0) * transform.forward;
+        Vector3 right = Quaternion.Euler(0, viewAngle * 0.5f, 0) * transform.forward;
         Gizmos.color = Color.cyan;
         Gizmos.DrawLine(eye, eye + left * viewDistance);
         Gizmos.DrawLine(eye, eye + right * viewDistance);

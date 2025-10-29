@@ -7,6 +7,8 @@ using UnityEngine;
 /// - Increases when picking up lore (major/minor)
 /// - Decays when player is far away
 /// Pushes deltas to MonsterAI.aggression each frame.
+/// 
+/// Minimal edits: added debug toggles and time-based log interval to avoid console spam.
 /// </summary>
 public class GameDirector : MonoBehaviour {
     public MonsterAI monster;
@@ -17,6 +19,11 @@ public class GameDirector : MonoBehaviour {
     public float nearIncrease = 0.7f; // amount per second when near threshold
     public float runIncrease = 0.12f; // per second of sprinting
     public float nearThreshold = 12f; // meters
+
+    [Header("Debug (toggle in Inspector)")]
+    public bool debugLogs = false;      // <-- mới: bật tắt log
+    public float logInterval = 3f;     // giây giữa các log (mặc định 1s)
+    private float lastLogTime = 0f;
 
     void Update(){
         if (monster == null || player == null) return;
@@ -34,10 +41,11 @@ public class GameDirector : MonoBehaviour {
         // Push delta to monster
         monster.AdjustAggression(aggression - monster.aggression);
         
-        // Debug aggression
-        if (Time.frameCount % 60 == 0) // Log mỗi giây
+        // Debug aggression (giờ sử dụng time interval và toggle)
+        if (debugLogs && Time.time - lastLogTime >= logInterval)
         {
-            Debug.Log($"GameDirector: aggression={aggression}, monster.aggression={monster.aggression}, distance={dist:F1}m");
+            Debug.Log($"GameDirector: aggression={aggression:F3}, monster.aggression={monster.aggression:F3}, distance={dist:F1}m");
+            lastLogTime = Time.time;
         }
     }
 
@@ -47,7 +55,7 @@ public class GameDirector : MonoBehaviour {
     /// </summary>
     public void OnPlayerSprinted(float secs){
         aggression = Mathf.Clamp01(aggression + runIncrease * Mathf.Max(0f, secs));
-        Debug.Log($"Player sprinted for {secs}s, aggression now: {aggression}");
+        if (debugLogs) Debug.Log($"Player sprinted for {secs}s, aggression now: {aggression:F3}");
     }
 
     /// <summary>
@@ -55,6 +63,6 @@ public class GameDirector : MonoBehaviour {
     /// </summary>
     public void OnLorePicked(bool major){
         aggression = Mathf.Clamp01(aggression + (major ? 0.14f : 0.05f));
-        Debug.Log($"Lore picked up (major={major}), aggression now: {aggression}");
+        if (debugLogs) Debug.Log($"Lore picked up (major={major}), aggression now: {aggression:F3}");
     }
 }

@@ -36,6 +36,8 @@ public class BunkerDoorInteraction : MonoBehaviour, IInteractable
         if (!ObjectiveManager.Instance.HasItem(requiredKeyID))
         {
             Debug.Log(needKeyText);
+            if (UIMessageManager.Instance != null)
+                UIMessageManager.Instance.ShowMessage(needKeyText);
             return;
         }
 
@@ -43,13 +45,15 @@ public class BunkerDoorInteraction : MonoBehaviour, IInteractable
             doorAnimator.SetTrigger(unlockTrigger);
 
         Debug.Log(openText);
+        if (UIMessageManager.Instance != null)
+            UIMessageManager.Instance.ShowMessage("Cánh cửa đã mở!");
+
         isOpened = true;
     }
 
-    // 🔹 Thêm dòng này để tương thích với PlayerInteract
     public string GetInteractionPrompt()
     {
-        if (isOpened) 
+        if (isOpened)
             return ""; // Khi đã mở rồi thì không hiện gì nữa
         return "Nhấn E để mở cửa";
     }
