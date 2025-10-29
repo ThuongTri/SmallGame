@@ -830,8 +830,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05f27264bfcb5074386e7ef3e4ff1f90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemID: pice_map
-  itemTitle: pice map 2
+  itemID: map_2
+  itemTitle: Lore + Objective
   loreText: 
   itemIcon: {fileID: 21300000, guid: 64edb6a5249108d42b44fd9fcb21e69f, type: 3}
   pickupSound: {fileID: 0}
@@ -1054,8 +1054,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05f27264bfcb5074386e7ef3e4ff1f90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemID: pice_map
-  itemTitle: 'pice map 1 '
+  itemID: map_1
+  itemTitle: Lore + Objective
   loreText: 
   itemIcon: {fileID: 21300000, guid: 64edb6a5249108d42b44fd9fcb21e69f, type: 3}
   pickupSound: {fileID: 0}
@@ -1340,13 +1340,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 776d0d64b5f2d7f4ab1dba22f49d13d6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1115971461}
   m_SourcePrefab: {fileID: 100100000, guid: 776d0d64b5f2d7f4ab1dba22f49d13d6, type: 3}
 --- !u!4 &1115971459 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 776d0d64b5f2d7f4ab1dba22f49d13d6, type: 3}
   m_PrefabInstance: {fileID: 1115971458}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1115971460 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 776d0d64b5f2d7f4ab1dba22f49d13d6, type: 3}
+  m_PrefabInstance: {fileID: 1115971458}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1115971461
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1115971460}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05f27264bfcb5074386e7ef3e4ff1f90, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemID: 
+  itemTitle: 
+  loreText: 
+  itemIcon: {fileID: 0}
+  pickupSound: {fileID: 0}
+  oneTimeCollect: 1
 --- !u!1 &1168427090
 GameObject:
   m_ObjectHideFlags: 0
@@ -1549,6 +1575,53 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7947265672072290514, guid: 665f7358916aecc469f96487403a78c2, type: 3}
   m_PrefabInstance: {fileID: 6719546973366168318}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1291555774
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1291555776}
+  - component: {fileID: 1291555775}
+  m_Layer: 0
+  m_Name: ObjectiveManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1291555775
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1291555774}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c59c81560e44a384e9ebc796f7d87634, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bunkerWaypoint: {fileID: 0}
+  bunkerDoor: {fileID: 1115971460}
+  hintAudio: {fileID: 0}
+--- !u!4 &1291555776
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1291555774}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -54.98762, y: -8.660163, z: 51.636547}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1328723894
 GameObject:
   m_ObjectHideFlags: 0
@@ -1948,8 +2021,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05f27264bfcb5074386e7ef3e4ff1f90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemID: old_key
-  itemTitle: old key
+  itemID: rusty_key
+  itemTitle: Lore + Objective
   loreText: 
   itemIcon: {fileID: 21300000, guid: 8c51b8b0bace18641bb4705deea74efc, type: 3}
   pickupSound: {fileID: 0}
@@ -2093,8 +2166,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05f27264bfcb5074386e7ef3e4ff1f90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemID: pice_map
-  itemTitle: pice map 3
+  itemID: map_3
+  itemTitle: Lore + Objective
   loreText: 
   itemIcon: {fileID: 21300000, guid: 64edb6a5249108d42b44fd9fcb21e69f, type: 3}
   pickupSound: {fileID: 0}
@@ -3927,3 +4000,4 @@ SceneRoots:
   - {fileID: 1308759770934415663}
   - {fileID: 6421147597046823404}
   - {fileID: 1680407751}
+  - {fileID: 1291555776}

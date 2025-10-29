@@ -16,24 +16,23 @@ public class Collectible : MonoBehaviour, IInteractable
 
     public void OnInteract()
     {
-        // Nếu đã nhặt và chỉ được nhặt 1 lần thì không làm gì cả
         if (oneTimeCollect && collected) return;
         collected = true;
 
-        // Phát âm thanh nếu có
         if (pickupSound)
             AudioSource.PlayClipAtPoint(pickupSound, transform.position);
 
-        // In ra Console để kiểm tra
         Debug.Log($"[Nhặt đồ] {itemID}: {itemTitle}");
 
-        // Thêm thông tin vào LoreManager
+        // ✅ Gọi LoreManager
         if (LoreManager.Instance != null)
             LoreManager.Instance.AddLore(itemID, itemTitle, loreText, itemIcon);
 
-        // THAY ĐỔI QUAN TRỌNG NHẤT Ở ĐÂY:
-        // gameObject.SetActive(false); // Dòng này chỉ ẩn vật thể đi tạm thời.
-        Destroy(gameObject); // Dòng này sẽ XÓA HẲN vật thể khỏi màn chơi.
+        // ✅ Gọi ObjectiveManager (nếu có)
+        if (ObjectiveManager.Instance != null)
+            ObjectiveManager.Instance.OnItemCollected(itemID);
+
+        Destroy(gameObject); // Giữ nguyên logic xoá vật phẩm
     }
 
     public string GetInteractionPrompt()
