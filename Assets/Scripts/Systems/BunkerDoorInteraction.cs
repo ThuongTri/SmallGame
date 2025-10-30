@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class BunkerDoorInteraction : MonoBehaviour, IInteractable
 {
@@ -14,6 +16,11 @@ public class BunkerDoorInteraction : MonoBehaviour, IInteractable
     public string needKeyText = "Cần chìa khóa để mở cánh cửa.";
     [TextArea]
     public string openText = "Cánh cửa mở ra...";
+
+    [Header("Bad Ending Setup")]
+    public string badEndingScene = "BadEnding"; // tên scene Bad Ending
+    public float delayBeforeEnd = 4f; // thời gian chờ
+    public string escapeMessage = "Bạn đã rời khỏi nơi này...";
 
     private bool isOpened = false;
 
@@ -33,6 +40,7 @@ public class BunkerDoorInteraction : MonoBehaviour, IInteractable
             return;
         }
 
+        // Kiểm tra xem người chơi có chìa chưa
         if (!ObjectiveManager.Instance.HasItem(requiredKeyID))
         {
             Debug.Log(needKeyText);
@@ -41,6 +49,7 @@ public class BunkerDoorInteraction : MonoBehaviour, IInteractable
             return;
         }
 
+        // Nếu có chìa, mở cửa
         if (doorAnimator != null)
             doorAnimator.SetTrigger(unlockTrigger);
 
@@ -49,6 +58,31 @@ public class BunkerDoorInteraction : MonoBehaviour, IInteractable
             UIMessageManager.Instance.ShowMessage("Cánh cửa đã mở!");
 
         isOpened = true;
+
+        // ✅ Gọi UI lựa chọn rời đi (thay vì gọi Bad Ending ngay lập tức)
+        if (EndingManager.Instance != null)
+        {
+            // Hiển thị hộp thoại cho người chơi chọn
+            EndingManager.Instance.ShowExitChoice(
+                "Leave?",
+                badEndingScene
+            );
+        }
+        else
+        {
+            // Nếu chưa có EndingManager trong scene, xử lý trực tiếp ở đây
+            StartCoroutine(TriggerBadEndingDirect());
+        }
+    }
+
+    IEnumerator TriggerBadEndingDirect()
+    {
+        if (UIMessageManager.Instance != null)
+            UIMessageManager.Instance.ShowMessage(escapeMessage);
+
+        yield return new WaitForSeconds(delayBeforeEnd);
+
+        SceneManager.LoadScene(badEndingScene);
     }
 
     public string GetInteractionPrompt()
