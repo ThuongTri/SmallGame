@@ -83,19 +83,7 @@ public class PlayerController : MonoBehaviour
 //     private float cameraPitch = 0f;      // Góc nhìn dọc
 
 //     void Start()
-//     {
-//         controller = GetComponent<CharacterController>();
-//         Cursor.lockState = CursorLockMode.Locked; // Khóa chuột
-//     }
-
-//     void Update()
-//     {
-//         Move();
-//         Look();
-//     }
-
-//     void Move()
-//     {
+//   
 //         float moveX = Input.GetAxis("Horizontal"); // A/D
 //         float moveZ = Input.GetAxis("Vertical");   // W/S
 
