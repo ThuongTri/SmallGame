@@ -1,0 +1,366 @@
+fileFormatVersion: 2
+guid: 980aa268d3fcda74286e67e68a5df6ca
+ModelImporter:
+  serializedVersion: 22200
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: enemy_tonnel
+    second: {fileID: 2100000, guid: 926fa22c8b2db9645b7fbf4daf733451, type: 2}
+  materials:
+    materialImportMode: 2
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    removeConstantScaleCurves: 0
+    motionNodeName: 
+    rigImportErrors: "Invalid Avatar Rig Configuration. Missing or invalid transform:\n\tRequired
+      human bone 'LeftFoot' not found\n"
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 1
+    animationCompression: 3
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: enemy_tonnel_walk
+      takeName: enemy_tonnel_walk
+      internalID: 5260032476361667979
+      firstFrame: 0
+      lastFrame: 29
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: enemy_tonnel_find
+      takeName: enemy_tonnel_find
+      internalID: 3718253983659942957
+      firstFrame: 0
+      lastFrame: 147
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: END_ene_tonnel
+      takeName: END_ene_tonnel
+      internalID: -8847633168717215907
+      firstFrame: 0
+      lastFrame: 1
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: enemy_tonnel_walk (1)
+      takeName: enemy_tonnel_walk
+      internalID: -1493125091919578971
+      firstFrame: 0
+      lastFrame: 29
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    isReadable: 0
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importPhysicalCameras: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    nodeNameCollisionStrategy: 1
+    fileIdsGeneration: 2
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    keepQuads: 0
+    weldVertices: 1
+    bakeAxisConversion: 0
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    optimizeBones: 1
+    meshOptimizationFlags: -1
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 1
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    strictVertexDataChecks: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
+  importAnimation: 1
+  humanDescription:
+    serializedVersion: 3
+    human: []
+    skeleton:
+    - name: enemy_tonnel(Clone)
+      parentName: 
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: 0, y: -0, z: -0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
+    - name: Armature_enemy_tonnel
+      parentName: enemy_tonnel(Clone)
+      position: {x: -0, y: 0, z: 0}
+      rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071068}
+      scale: {x: 33.36306, y: 33.36306, z: 33.36306}
+    - name: berry
+      parentName: Armature_enemy_tonnel
+      position: {x: -0.008672658, y: 0.0031016388, z: -0.000057549027}
+      rotation: {x: -0.50000006, y: 0.5, z: -0.5, w: -0.49999994}
+      scale: {x: 1, y: 0.9999999, z: 1.0000001}
+    - name: body
+      parentName: berry
+      position: {x: -4.190952e-11, y: -4.911271e-10, z: 0.000000004315807}
+      rotation: {x: 0.000000090762455, y: 0.9979292, z: -0.0000001279818, w: 0.06432287}
+      scale: {x: 0.99999994, y: 1.0000001, z: 1.0000001}
+    - name: head
+      parentName: body
+      position: {x: -0.03371332, y: 0.0000000015646219, z: -2.235174e-10}
+      rotation: {x: -0.00000012609942, y: 0.08122035, z: -0.000000093296464, w: 0.9966962}
+      scale: {x: 0.9999998, y: 1.0000001, z: 0.9999998}
+    - name: chin
+      parentName: head
+      position: {x: -0.0074827387, y: -0.00007152222, z: 0.0028728729}
+      rotation: {x: 0.000000014987153, y: 0.85571915, z: 0.00000022037423, w: 0.5174406}
+      scale: {x: 1.0000001, y: 0.9999999, z: 1.0000006}
+    - name: arm1_r
+      parentName: body
+      position: {x: -0.02830324, y: -0.001470971, z: -0.001145851}
+      rotation: {x: -0.48803464, y: -0.5227471, z: 0.5071408, w: 0.4810052}
+      scale: {x: 0.9999999, y: 0.9999998, z: 0.99999964}
+    - name: arm2_r
+      parentName: arm1_r
+      position: {x: -0.01623486, y: 0.000000001452863, z: 0.000000002682209}
+      rotation: {x: 0.13804458, y: -0.0082196575, z: -0.01708385, w: 0.99024457}
+      scale: {x: 1.0000004, y: 0.9999999, z: 0.99999976}
+    - name: arm3_r
+      parentName: arm2_r
+      position: {x: -0.02630634, y: 0.000000003352761, z: 2.235174e-10}
+      rotation: {x: -0.05377383, y: 0.031883124, z: 0.029722866, w: 0.9976014}
+      scale: {x: 1.0000001, y: 1.0000004, z: 1.0000001}
+    - name: arm4_r
+      parentName: arm3_r
+      position: {x: -0.029828109, y: 0.000000003101304, z: -0.000000001117587}
+      rotation: {x: -0.008602251, y: -0.07773411, z: 0.00039629088, w: 0.99693704}
+      scale: {x: 0.9999998, y: 0.9999998, z: 1.0000001}
+    - name: IK_arm_r2
+      parentName: body
+      position: {x: 0.002486878, y: -0.03531456, z: -0.01570922}
+      rotation: {x: 0.37547377, y: -0.57176, z: 0.33000153, w: 0.6505452}
+      scale: {x: 0.9999998, y: 0.99999976, z: 0.99999976}
+    - name: arm1_l
+      parentName: body
+      position: {x: -0.028303228, y: 0.0012426869, z: -0.001145853}
+      rotation: {x: -0.4099273, y: 0.44030216, z: 0.580164, w: -0.5490933}
+      scale: {x: 1.0000001, y: 0.9999998, z: 0.9999997}
+    - name: arm2_l
+      parentName: arm1_l
+      position: {x: -0.01623487, y: 0.000000002123415, z: -0.000000003352761}
+      rotation: {x: 0.0006388721, y: -0.009640734, z: 0.014449307, w: 0.99984896}
+      scale: {x: 1.0000002, y: 1.0000004, z: 1.0000005}
+    - name: arm3_l
+      parentName: arm2_l
+      position: {x: -0.02633438, y: 0.0000000013411039, z: 1.04773794e-10}
+      rotation: {x: 0.9959714, y: -0.032397, z: -0.048173457, w: -0.068343505}
+      scale: {x: 1.0000008, y: 0.9999998, z: 1.0000004}
+    - name: arm4_l
+      parentName: arm3_l
+      position: {x: -0.029828109, y: 0.000000004023313, z: -4.470348e-10}
+      rotation: {x: -0.9802759, y: 0.020936266, z: 0.09451997, w: 0.17229845}
+      scale: {x: 0.9999997, y: 1.0000001, z: 0.99999964}
+    - name: IK_arm_l2
+      parentName: body
+      position: {x: 0.0012877, y: 0.0060909376, z: -0.022943398}
+      rotation: {x: 0.3754738, y: -0.57175994, z: 0.33000156, w: 0.6505452}
+      scale: {x: 0.9999997, y: 0.99999994, z: 0.99999964}
+    - name: foot1_r
+      parentName: berry
+      position: {x: -0.027123729, y: -0.008824342, z: 0.001192489}
+      rotation: {x: 0.016035043, y: -0.0325035, z: 0.0173808, w: -0.9991919}
+      scale: {x: 1.0000005, y: 1.0000004, z: 1.000001}
+    - name: foot2_r
+      parentName: foot1_r
+      position: {x: -0.03333153, y: 0.0000000017881389, z: -0.0000000013411039}
+      rotation: {x: 0.001091683, y: -0.034851216, z: 0.001351817, w: 0.999391}
+      scale: {x: 0.99999994, y: 1.0000002, z: 0.9999998}
+    - name: foot3_r
+      parentName: foot2_r
+      position: {x: -0.04629098, y: 0.0000000055879346, z: 0.000000008270145}
+      rotation: {x: -0.8053455, y: -0.0032498809, z: -0.59240067, w: 0.021672154}
+      scale: {x: 0.99999964, y: 0.9999997, z: 0.9999997}
+    - name: IK_arm_r
+      parentName: berry
+      position: {x: -0.01091879, y: -0.03743187, z: 0.01062197}
+      rotation: {x: 0.35346976, y: 0.61242074, z: -0.35346955, w: 0.61242086}
+      scale: {x: 1.0000001, y: 1, z: 1.0000002}
+    - name: foot1_l
+      parentName: berry
+      position: {x: -0.02717908, y: 0.008596061, z: 0.00119249}
+      rotation: {x: -0.015053313, y: 0.032000184, z: 0.01841402, w: 0.9992049}
+      scale: {x: 1.0000004, y: 1.0000004, z: 1.0000006}
+    - name: foot2_l
+      parentName: foot1_l
+      position: {x: -0.033276346, y: 0.000000001983717, z: 0.000000001005828}
+      rotation: {x: 0.0010588727, y: 0.034752436, z: 0.003546501, w: -0.9993892}
+      scale: {x: 1.0000002, y: 1.0000001, z: 0.99999994}
+    - name: foot3_l
+      parentName: foot2_l
+      position: {x: -0.046290986, y: 0.00000000345055, z: -5.587935e-11}
+      rotation: {x: -0.80563015, y: 0.021655977, z: -0.5920134, w: 0.0033614307}
+      scale: {x: 1.0000001, y: 0.9999997, z: 1}
+    - name: IK_arm_l
+      parentName: berry
+      position: {x: -0.025564248, y: 0.03057171, z: -0.014248279}
+      rotation: {x: 0.35346982, y: 0.6124206, z: -0.35346967, w: 0.61242086}
+      scale: {x: 1.0000006, y: 1.0000002, z: 1.0000005}
+    - name: IK_foot_r
+      parentName: Armature_enemy_tonnel
+      position: {x: -0.0077263215, y: 0.03430868, z: -0.094248995}
+      rotation: {x: 0.6829878, y: 0.1831059, z: -0.6829877, w: 0.18310605}
+      scale: {x: 1.0000004, y: 0.9999999, z: 1.0000002}
+    - name: IK_foot_l
+      parentName: Armature_enemy_tonnel
+      position: {x: 0.003037159, y: -0.010882749, z: -0.1016151}
+      rotation: {x: 0.68298775, y: 0.18310602, z: -0.68298763, w: 0.1831062}
+      scale: {x: 1.0000002, y: 1.0000001, z: 1.0000001}
+    - name: enemy_tonnel
+      parentName: enemy_tonnel(Clone)
+      position: {x: -0.0001240434, y: -1.3366718, z: 0.7517433}
+      rotation: {x: -0.7071068, y: 2.512148e-15, z: 2.512148e-15, w: 0.7071068}
+      scale: {x: 0.9999998, y: 0.9999999, z: 0.9999999}
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    globalScale: 1
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
+  animationType: 2
+  humanoidOversampling: 1
+  avatarSetup: 1
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 1
+  importBlendShapeDeformPercent: 1
+  remapMaterialsIfMaterialImportModeIsNone: 0
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
