@@ -3,7 +3,12 @@ guid: 87854f039d83d02488e22d015bbaa3eb
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Creepy_Doll_Head
+    second: {fileID: 2100000, guid: 054fd89cecb34c04a8fce341e4c4082a, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

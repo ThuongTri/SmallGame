@@ -10,13 +10,15 @@ public class PlayerController : MonoBehaviour
     public float gravity = -9.81f;    
 
     [Header("Camera")]
-    public Transform cameraTransform; 
+    // TÔI KHÔNG THAY ĐỔI GÌ Ở ĐÂY.
+    // HÃY KÉO VCam_PlayerFollow CỦA BẠN VÀO Ô NÀY TRONG INSPECTOR.
+    public Transform cameraTransform;  
 
     [Header("Stamina Settings")]
     public float maxStamina = 5f;     
     public float staminaRegenRate = 1f; 
     private float stamina;            
-    private bool exhausted = false;   
+    private bool exhausted = false;     
 
     [Header("Breathing Sounds")]
     public AudioSource breathingAudio;
@@ -29,6 +31,10 @@ public class PlayerController : MonoBehaviour
     private float verticalVelocity;   
     private float cameraPitch = 0f;   
 
+    // === BIẾN MỚI ĐỂ KHÓA INPUT ===
+    private bool isInputLocked = false; 
+    // =============================
+
     // Sprint reporting state
     private bool wasSprinting = false;
     private float sprintAccumulatedSeconds = 0f;
@@ -37,11 +43,14 @@ public class PlayerController : MonoBehaviour
     {
         controller = GetComponent<CharacterController>();
         Cursor.lockState = CursorLockMode.Locked; 
+        Cursor.visible = false; // Thêm dòng này để ẩn chuột
         stamina = maxStamina; 
     }
 
     void Update()
     {
+        // Chúng ta vẫn chạy HandleBreathing()
+        // để stamina có thể hồi khi đang trong cutscene
         Move();
         Look();
         HandleBreathing();
@@ -49,6 +58,10 @@ public class PlayerController : MonoBehaviour
 
     void Move()
     {
+        // === CHECK KHÓA INPUT ===
+        if (isInputLocked) return; 
+        // ========================
+
         float moveX = Input.GetAxis("Horizontal"); 
         float moveZ = Input.GetAxis("Vertical");   
 
@@ -131,6 +144,10 @@ public class PlayerController : MonoBehaviour
 
     void Look()
     {
+        // === CHECK KHÓA INPUT ===
+        if (isInputLocked) return; 
+        // ========================
+
         float mouseX = Input.GetAxis("Mouse X") * lookSensitivity;
         float mouseY = Input.GetAxis("Mouse Y") * lookSensitivity;
 
@@ -138,6 +155,9 @@ public class PlayerController : MonoBehaviour
 
         cameraPitch -= mouseY;
         cameraPitch = Mathf.Clamp(cameraPitch, -80f, 80f);
+
+        // Code của bạn đã chuẩn, chỉ cần gán đúng VCam_PlayerFollow
+        // vào 'cameraTransform' là nó sẽ chạy
         cameraTransform.localRotation = Quaternion.Euler(cameraPitch, 0f, 0f);
     }
 
@@ -157,5 +177,33 @@ public class PlayerController : MonoBehaviour
     public float GetStaminaPercent()
     {
         return stamina / maxStamina;
+    }
+
+    // =======================================================
+    // === CÁC HÀM MỚI DÙNG CHO CUTSCENE (SIGNAL RECEIVER) ===
+    // =======================================================
+
+    /// <summary>
+    /// Hàm này được gọi bởi Signal Receiver trên Timeline để khóa input.
+    /// </summary>
+    public void LockPlayerInput()
+    {
+        isInputLocked = true;
+        
+        // Hiện con trỏ chuột để bấm menu (nếu cutscene có lựa chọn)
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+
+    /// <summary>
+    /// Hàm này được gọi bởi Signal Receiver trên Timeline để mở khóa input.
+    /// </summary>
+    public void UnlockPlayerInput()
+    {
+        isInputLocked = false;
+        
+        // Khóa con trỏ chuột lại cho gameplay
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 }

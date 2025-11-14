@@ -66,7 +66,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -187,14 +187,38 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   silhouettePrefab: {fileID: 8092086756895830378, guid: a1e7d3be9e66ff34d8908057389da193, type: 3}
+  jumpscare3DPrefab: {fileID: 0}
   scareSounds:
   - {fileID: 8300000, guid: b8dc7330d4eb5f84a9fbc2e5d2b165f7, type: 3}
   - {fileID: 8300000, guid: 400edcee17d2343408569d9ac26d04a2, type: 3}
   - {fileID: 8300000, guid: 941907831ba7e9d45a62b6713def1365, type: 3}
   player: {fileID: 0}
+  monster: {fileID: 3752772928619106337}
+  use3D: 1
   minDist: 6
   maxDist: 14
-  monster: {fileID: 3752772928619106337}
+  eyeHeightOffset: 1.5
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  clearRadius: 0.4
+  enableRandomJumpscare: 1
+  randomMinDist: 2
+  randomMaxDist: 4
+  randomChance: 0.35
+  enable360Jumpscare: 1
+  frontChance: 0.6
+  frontTriggerDistance: 8
+  frontMinDist: 1.5
+  frontMaxDist: 3
+  randomInterval: 4
+  frontInterval: 2
+  visibleDurationRange: {x: 3, y: 5}
+  animatorTrigger: Scare
+  debugMode: 0
 --- !u!82 &9092545021546788921
 AudioSource:
   m_ObjectHideFlags: 0

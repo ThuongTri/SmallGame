@@ -3761,6 +3761,10 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5991560410077691550, guid: 13027ef6b5b126e43bd477e4f79332fc, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
     - target: {fileID: 8196648454354850568, guid: 13027ef6b5b126e43bd477e4f79332fc, type: 3}
       propertyPath: player
       value: 
@@ -4037,6 +4041,10 @@ PrefabInstance:
       propertyPath: gameDirector
       value: 
       objectReference: {fileID: 92593729}
+    - target: {fileID: 5833027105443527492, guid: e13055ba0afe70e42a9b168589ff9868, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
     - target: {fileID: 5872861743550425498, guid: e13055ba0afe70e42a9b168589ff9868, type: 3}
       propertyPath: m_Name
       value: 'Player '
