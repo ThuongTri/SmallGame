@@ -1,18 +1,22 @@
 using UnityEngine;
+using UnityEngine.Playables; // <<< DÒNG MỚI (Để Unity hiểu PlayableDirector)
 
 public class Collectible : MonoBehaviour, IInteractable
 {
     [Header("Thông tin vật phẩm")]
-    public string itemID;               // ID lore
-    public string itemTitle;            // Tên lore
+    public string itemID;                // ID lore
+    public string itemTitle;             // Tên lore
     [TextArea(3, 6)]
-    public string loreText;             // Mô tả lore
+    public string loreText;              // Mô tả lore
     public Sprite itemIcon;
     public AudioClip pickupSound;
 
     [Header("Tùy chọn")]
     public bool oneTimeCollect = true;
     private bool collected = false;
+
+    [Header("Cutscene (Tùy chọn)")] // <<< DÒNG MỚI (Header cho gọn gàng)
+    public PlayableDirector cutsceneToPlay; // <<< DÒNG MỚI (Tạo ô gán Director)
 
     public void OnInteract()
     {
@@ -35,6 +39,15 @@ public class Collectible : MonoBehaviour, IInteractable
         // ✅ Hiển thị thông báo lên màn hình
         if (UIMessageManager.Instance != null)
             UIMessageManager.Instance.ShowMessage("Bạn nhặt được " + itemTitle);
+
+        // ======================================
+        // === KÍCH HOẠT CUTSCENE (LOGIC MỚI) ===
+        // ======================================
+        if (cutsceneToPlay != null) // Nếu chúng ta có gán cutscene vào vật phẩm này
+        {
+            cutsceneToPlay.Play(); // Chạy nó!
+        }
+        // ======================================
 
         Destroy(gameObject); // Xoá vật phẩm sau khi nhặt
     }
