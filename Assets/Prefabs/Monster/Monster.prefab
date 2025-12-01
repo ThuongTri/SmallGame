@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 7000955561041145652}
   - component: {fileID: 1838517163678312894}
   - component: {fileID: 3752772928619106337}
-  - component: {fileID: 8196648454354850568}
   - component: {fileID: 9092545021546788921}
   m_Layer: 6
   m_Name: Monster
@@ -145,13 +144,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2be008be35c2bf64c992a720d9ea393a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  uiManager: {fileID: 0}
   state: 0
   agent: {fileID: 0}
   player: {fileID: 0}
-  waypoints:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  animator: {fileID: 0}
+  patrolRadius: 30
+  waitTimeMin: 2
+  waitTimeMax: 5
   viewAngle: 50
   viewDistance: 30
   visionMask:
@@ -162,10 +162,13 @@ MonoBehaviour:
   patrolSpeed: 10
   stalkSpeed: 10
   chaseSpeed: 5
+  catchDistance: 1.5
+  jumpscareFaceSpeed: 5
   stalkMinDist: 12
   stalkMaxDist: 18.1
   whisperClips: []
   mimicVoiceClip: {fileID: 8300000, guid: 7e47405f52a526449858aba88084e052, type: 3}
+  jumpscareScreamClip: {fileID: 0}
   searchDuration: 8
   aggression: 0
   bellyRenderer: {fileID: 0}
@@ -174,51 +177,6 @@ MonoBehaviour:
   bobSpeed: 2
   bobAmount: 0.12
   drawGizmos: 1
---- !u!114 &8196648454354850568
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8439689010359314536}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c9042d7d10d3a749890cc5ad0e00c5a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  silhouettePrefab: {fileID: 8092086756895830378, guid: a1e7d3be9e66ff34d8908057389da193, type: 3}
-  jumpscare3DPrefab: {fileID: 0}
-  scareSounds:
-  - {fileID: 8300000, guid: b8dc7330d4eb5f84a9fbc2e5d2b165f7, type: 3}
-  - {fileID: 8300000, guid: 400edcee17d2343408569d9ac26d04a2, type: 3}
-  - {fileID: 8300000, guid: 941907831ba7e9d45a62b6713def1365, type: 3}
-  player: {fileID: 0}
-  monster: {fileID: 3752772928619106337}
-  use3D: 1
-  minDist: 6
-  maxDist: 14
-  eyeHeightOffset: 1.5
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  obstacleMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  clearRadius: 0.4
-  enableRandomJumpscare: 1
-  randomMinDist: 2
-  randomMaxDist: 4
-  randomChance: 0.35
-  enable360Jumpscare: 1
-  frontChance: 0.6
-  frontTriggerDistance: 8
-  frontMinDist: 1.5
-  frontMaxDist: 3
-  randomInterval: 4
-  frontInterval: 2
-  visibleDurationRange: {x: 3, y: 5}
-  animatorTrigger: Scare
-  debugMode: 0
 --- !u!82 &9092545021546788921
 AudioSource:
   m_ObjectHideFlags: 0

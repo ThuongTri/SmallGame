@@ -5,20 +5,22 @@ using System.Collections;
 [RequireComponent(typeof(UnityEngine.AudioSource))]
 public class MonsterAI : MonoBehaviour
 {
-    public enum State { Patrol, Stalk, Chase, Search, Jumpscare } // Thêm state Jumpscare
+    [Header("UI Connection")]
+    public GameOverManager uiManager;
+
+    public enum State { Patrol, Stalk, Chase, Search, Jumpscare } 
     public State state = State.Patrol;
 
     [Header("Core")]
     public NavMeshAgent agent;
     public Transform player;
-    // ❌ ĐÃ XÓA: public Transform[] waypoints; 
 
     [Header("Animation")]
     public Animator animator;
 
     [Header("Random Patrol")]
-    public float patrolRadius = 30f; // Bán kính đi tuần ngẫu nhiên
-    public float waitTimeMin = 2f;   // Đứng chơi xíu rồi đi tiếp
+    public float patrolRadius = 30f; 
+    public float waitTimeMin = 2f;   
     public float waitTimeMax = 5f;
 
     [Header("Senses")]
@@ -31,11 +33,16 @@ public class MonsterAI : MonoBehaviour
     [Header("Speeds")]
     public float patrolSpeed = 1.4f;
     public float stalkSpeed = 2.2f;
-    public float chaseSpeed = 6.0f; // Tăng tốc độ đuổi lên chút cho ghê
+    public float chaseSpeed = 6.0f;
+
+    [Header("Chase Settings (New)")]
+    public float maxChaseDuration = 5f; 
+    private float chaseTimer = 0f;      
 
     [Header("Jumpscare / Attack")]
-    public float catchDistance = 1.5f; // Khoảng cách bị bắt (gần sát mặt)
-    public float jumpscareFaceSpeed = 5f; // Tốc độ quái xoay mặt vào player
+    public Transform faceTarget; // ✅ Kéo xương ĐẦU của quái vào đây
+    public float catchDistance = 2.5f; 
+    public float jumpscareFaceSpeed = 5f;
     private bool isJumpscaring = false;
 
     [Header("Stalk settings")]
@@ -43,7 +50,7 @@ public class MonsterAI : MonoBehaviour
     public float stalkMaxDist = 18f;
     public AudioClip[] whisperClips;
     public AudioClip mimicVoiceClip;
-    public AudioClip jumpscareScreamClip; // Âm thanh khi bắt được
+    public AudioClip jumpscareScreamClip; 
     AudioSource audioSource;
 
     [Header("Search")]
@@ -65,7 +72,7 @@ public class MonsterAI : MonoBehaviour
     public bool drawGizmos = true;
 
     float lastHeardLogTime = -10f;
-    float patrolWaitTimer = 0f; // Biến đếm thời gian đứng nghỉ
+    float patrolWaitTimer = 0f; 
 
     void Awake()
     {
@@ -83,17 +90,15 @@ public class MonsterAI : MonoBehaviour
     void Start()
     {
         agent.speed = patrolSpeed;
-        // Bắt đầu bằng việc tìm điểm ngẫu nhiên
         SetRandomDestination();
     }
 
     void Update()
     {
-        if (isJumpscaring) return; // Nếu đang hù thì không làm gì cả (để animation chạy)
+        if (isJumpscaring) return; 
 
         UpdateEmissionBob();
 
-        // Cập nhật Animator Speed
         if (animator != null) animator.SetFloat("Speed", agent.velocity.magnitude);
 
         switch (state)
@@ -104,25 +109,26 @@ public class MonsterAI : MonoBehaviour
             case State.Search: break;
         }
 
-        // Chỉ check nhìn thấy khi KHÔNG phải đang đuổi (để tối ưu) hoặc muốn update vị trí liên tục
-        if (state != State.Jumpscare && CanSeePlayer())
+        // Ưu tiên: Nếu đang Chase thì không cần check nhìn lại liên tục (trừ khi mất dấu)
+        if (state != State.Jumpscare && state != State.Chase)
         {
-            lastSighting = player.position;
-            EnterState(State.Chase);
+            if (CanSeePlayer())
+            {
+                lastSighting = player.position;
+                EnterState(State.Chase);
+            }
         }
     }
 
     // =====================================================
-    // LOGIC ĐI TUẦN NGẪU NHIÊN (MỚI)
+    // LOGIC ĐI TUẦN NGẪU NHIÊN
     // =====================================================
     void PatrolUpdate()
     {
         agent.speed = Mathf.Lerp(agent.speed, patrolSpeed, Time.deltaTime * 2f);
 
-        // Nếu đã đến đích (hoặc gần đến)
         if (!agent.pathPending && agent.remainingDistance < 1f)
         {
-            // Đứng nghỉ một chút cho tự nhiên
             patrolWaitTimer += Time.deltaTime;
             if (patrolWaitTimer >= Random.Range(waitTimeMin, waitTimeMax))
             {
@@ -138,10 +144,9 @@ public class MonsterAI : MonoBehaviour
         agent.SetDestination(randomPoint);
     }
 
-    // Hàm tìm điểm ngẫu nhiên trên NavMesh
     Vector3 GetRandomNavMeshPoint(Vector3 center, float radius)
     {
-        for (int i = 0; i < 10; i++) // Thử 10 lần
+        for (int i = 0; i < 10; i++)
         {
             Vector3 randomPos = center + Random.insideUnitSphere * radius;
             NavMeshHit hit;
@@ -150,20 +155,37 @@ public class MonsterAI : MonoBehaviour
                 return hit.position;
             }
         }
-        return center; // Nếu không tìm được thì đứng yên
+        return center;
     }
 
     // =====================================================
-    // LOGIC ĐUỔI BẮT & JUMPSCARE (MỚI)
+    // LOGIC ĐUỔI BẮT (CÓ GIỚI HẠN THỜI GIAN)
     // =====================================================
     void ChaseUpdate()
     {
         agent.speed = Mathf.Lerp(agent.speed, Mathf.Lerp(chaseSpeed * 0.9f, chaseSpeed, aggression), Time.deltaTime * 2f);
         agent.SetDestination(player.position);
 
-        float distToPlayer = Vector3.Distance(transform.position, player.position);
+        // Logic thời gian đuổi
+        chaseTimer += Time.deltaTime;
 
-        // Nếu quái đến quá gần -> BẮT LUÔN!
+        if (CanSeePlayer())
+        {
+            lastSighting = player.position;
+            // chaseTimer = 0f; // Nếu muốn reset timer khi nhìn thấy thì bỏ comment
+        }
+
+        if (chaseTimer >= maxChaseDuration)
+        {
+            EnterState(State.Search); 
+            return;
+        }
+
+        // Kiểm tra bắt người chơi (Bỏ qua trục Y để tính chính xác hơn)
+        Vector3 monsterPosFlat = new Vector3(transform.position.x, 0, transform.position.z);
+        Vector3 playerPosFlat = new Vector3(player.position.x, 0, player.position.z);
+        float distToPlayer = Vector3.Distance(monsterPosFlat, playerPosFlat);
+        
         if (distToPlayer <= catchDistance)
         {
             StartCoroutine(TriggerJumpscare());
@@ -175,55 +197,58 @@ public class MonsterAI : MonoBehaviour
         isJumpscaring = true;
         state = State.Jumpscare;
         
-        // 1. Dừng quái lại ngay lập tức
         agent.isStopped = true;
         agent.velocity = Vector3.zero;
 
-        // 2. Khóa Player (Gọi hàm Lock từ script PlayerController của bạn)
-        // Giả sử script PlayerController nằm trên object Player
         var playerCtrl = player.GetComponent<PlayerController>();
         if (playerCtrl != null) playerCtrl.LockPlayerInput();
 
-        // 3. Animation Tấn công
         if (animator != null)
         {
             animator.SetFloat("Speed", 0);
             animator.SetTrigger("Attack");
         }
 
-        // 4. Âm thanh Jumpscare
         if (jumpscareScreamClip != null) audioSource.PlayOneShot(jumpscareScreamClip);
 
-        // 5. Xoay Player nhìn vào mặt quái & Quái nhìn vào Player
         float timer = 0f;
         Quaternion startRot = player.rotation;
-        // Tính hướng nhìn vào quái (chỉ xoay trục Y)
-        Vector3 dirToMonster = (transform.position - player.position).normalized;
-        Quaternion lookRot = Quaternion.LookRotation(new Vector3(dirToMonster.x, 0, dirToMonster.z));
 
-        // Hiệu ứng xoay camera (hoặc xoay player) trong 0.5 giây
+        // ✅ LOGIC MỚI: Nhìn thẳng vào cái đầu (faceTarget)
+        // Nếu quên gán faceTarget thì nhìn cao lên 1.7m (tạm)
+        Vector3 targetLookPos = (faceTarget != null) ? faceTarget.position : transform.position + Vector3.up * 1.7f;
+        Vector3 dirToFace = (targetLookPos - player.position).normalized;
+        
+        // Cho phép xoay cả lên/xuống (bỏ việc khóa trục Y)
+        Quaternion lookRot = Quaternion.LookRotation(dirToFace);
+
         while (timer < 0.5f)
         {
+            // Xoay Player từ từ hướng về mặt quái
             player.rotation = Quaternion.Slerp(startRot, lookRot, timer / 0.5f);
             
-            // Quái cũng xoay mặt về phía player cho chuẩn
+            // Quái cũng xoay mặt về phía player
             Vector3 dirToPlayer = (player.position - transform.position).normalized;
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(new Vector3(dirToPlayer.x, 0, dirToPlayer.z)), Time.deltaTime * 10f);
+            dirToPlayer.y = 0; // Quái thì chỉ cần xoay ngang thôi
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dirToPlayer), Time.deltaTime * 10f);
             
             timer += Time.deltaTime;
             yield return null;
         }
 
-        // 6. Chờ animation đánh xong (ví dụ 1.5 giây)
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(1.0f); // Chờ animation đánh xong 1 chút
 
-        // 7. GAME OVER
-        Debug.Log("<color=red>YOU DIED! - RELOAD SCENE HERE</color>");
-        // Ở đây bạn có thể gọi SceneManager.LoadScene() hoặc hiện UI
-        // Time.timeScale = 0; // Tạm dừng game
+        // Gọi UI
+        if (uiManager != null)
+        {
+            uiManager.ShowGameOver();
+        }
+        else
+        {
+            Debug.LogError("Chưa gán UIManager vào MonsterAI!");
+        }
     }
 
-    // ... (Các hàm Stalk, Search, Vision giữ nguyên như cũ) ...
     void StalkUpdate()
     {
         agent.speed = Mathf.Lerp(agent.speed, stalkSpeed, Time.deltaTime * 2f);
@@ -241,6 +266,12 @@ public class MonsterAI : MonoBehaviour
     {
         if (state == next) return;
         state = next;
+
+        // Reset timer khi bắt đầu Chase
+        if (state == State.Chase)
+        {
+            chaseTimer = 0f;
+        }
 
         if (searchCoroutine != null)
         {
@@ -269,12 +300,10 @@ public class MonsterAI : MonoBehaviour
             }
             yield return null;
         }
-        // Tìm không thấy thì đi tuần tiếp
         SetRandomDestination(); 
         EnterState(State.Patrol);
     }
 
-    // ... (Phần còn lại giữ nguyên: CanSeePlayer, OnHearNoise...)
     bool CanSeePlayer()
     {
         if (player == null) return false;
@@ -294,6 +323,9 @@ public class MonsterAI : MonoBehaviour
 
     public void OnHearNoise(Vector3 pos)
     {
+        // KHÔNG chuyển sang Stalk nếu đang Chase (để tránh ngắt quãng việc đuổi)
+        if (state == State.Chase || state == State.Jumpscare) return;
+
         float dist = Vector3.Distance(transform.position, pos);
         float range = hearingBase * hearingMultiplier; 
         if (dist <= range)
@@ -331,19 +363,15 @@ public class MonsterAI : MonoBehaviour
     {
         if (!drawGizmos) return;
         Gizmos.color = Color.yellow; Gizmos.DrawWireSphere(transform.position, hearingBase);
-        Gizmos.color = Color.blue; Gizmos.DrawWireSphere(transform.position, patrolRadius); // Vẽ bán kính đi tuần
+        Gizmos.color = Color.blue; Gizmos.DrawWireSphere(transform.position, patrolRadius); 
+        Gizmos.color = Color.red; Gizmos.DrawWireSphere(transform.position, catchDistance); // Vẽ vòng tròn bắt
     }
-    // =====================================================
-    // CÁC HÀM HỖ TRỢ GAME DIRECTOR (BỊ THIẾU)
-    // =====================================================
 
-    // Hàm này để GameDirector gọi khi Player nhặt đồ hoặc nhìn vào quái
     public void AdjustAggression(float delta)
     {
         aggression = Mathf.Clamp01(aggression + delta);
     }
 
-    // Hàm này để SafeZone gọi khi Player chạy vào vùng an toàn
     public void OnEnterSafeZone()
     {
         aggression = Mathf.Max(0f, aggression - 0.4f);

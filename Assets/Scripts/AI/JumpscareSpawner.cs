@@ -1,15 +1,20 @@
 using UnityEngine;
 using System.Collections;
 
-/// <summary>
-/// JumpscareSpawner: Sinh hiệu ứng jumpscare (ngẫu nhiên hoặc trước mặt)
-/// - Giữ nguyên gameplay, chỉ tối ưu log.
-/// </summary>
 public class JumpscareSpawner : MonoBehaviour
 {
-    [Header("Prefabs")]
-    public GameObject silhouettePrefab;
-    public GameObject jumpscare3DPrefab;
+    [Header("Prefab Quái")]
+    public GameObject monsterPrefab; // Kéo con jumscare ramdom vào đây
+
+    [Header("Cài đặt Spawn")]
+    public float minDist = 5f;
+    public float maxDist = 12f;
+    public float spawnHeightOffset = 0f; // ✅ CHỈNH CÁI NÀY ĐỂ KÉO QUÁI LÊN KHỎI ĐẤT
+    public LayerMask groundMask = ~0;
+
+    [Header("Thời gian")]
+    public float randomInterval = 10f; // Bao lâu hù 1 lần
+    public float randomChance = 0.5f; // Tỉ lệ xuất hiện
 
     [Header("Audio")]
     public AudioClip[] scareSounds;
@@ -18,173 +23,69 @@ public class JumpscareSpawner : MonoBehaviour
     public Transform player;
     public MonsterAI monster;
 
-    [Header("Spawn Settings")]
-    public bool use3D = true;
-    public float minDist = 2f, maxDist = 4f;
-    public float eyeHeightOffset = 1.5f;
-    public LayerMask groundMask = ~0;
-    public LayerMask obstacleMask = ~0;
-    public float clearRadius = 0.4f;
-
-    [Header("Jumpscare Types")]
-    public bool enableRandomJumpscare = true;
-    public float randomMinDist = 2f, randomMaxDist = 4f;
-    public float randomChance = 0.35f;
-
-    public bool enable360Jumpscare = true;
-    public float frontChance = 0.6f;
-    public float frontTriggerDistance = 8f;
-    public float frontMinDist = 1.5f, frontMaxDist = 3f;
-
-    [Header("Timing")]
-    public float randomInterval = 4f;
-    public float frontInterval = 2f;
-    public Vector2 visibleDurationRange = new Vector2(3f, 5f);
-
-    [Header("Animation")]
-    public string animatorTrigger = "Scare";
-
-    [Header("Debug")]
-    public bool debugMode = false; // <--- Thêm cái này
-
-    // Private
     private float randomTimer;
-    private float frontTimer;
 
     void Start()
     {
-        if (debugMode)
-            Debug.Log("[JumpscareSpawner] Initialized (Random + Front)");
         randomTimer = randomInterval;
-        frontTimer = frontInterval;
+        if (player == null && GameObject.FindGameObjectWithTag("Player") != null)
+            player = GameObject.FindGameObjectWithTag("Player").transform;
     }
 
     void Update()
     {
         if (monster == null || player == null) return;
 
-        // Random jumpscare timer
-        if (enableRandomJumpscare)
+        randomTimer -= Time.deltaTime;
+        if (randomTimer <= 0f)
         {
-            randomTimer -= Time.deltaTime;
-            if (randomTimer <= 0f)
-            {
-                TryRandomJumpscare();
-                randomTimer = randomInterval;
-            }
-        }
-
-        // 360 jumpscare timer
-        if (enable360Jumpscare)
-        {
-            float distanceToMonster = Vector3.Distance(player.position, monster.transform.position);
-            bool isNearMonster = distanceToMonster < frontTriggerDistance;
-            bool hasHighAggression = monster.aggression > 0.1f;
-
-            if (isNearMonster || hasHighAggression)
-            {
-                frontTimer -= Time.deltaTime;
-                if (frontTimer <= 0f)
-                {
-                    Try360Jumpscare();
-                    frontTimer = frontInterval;
-                }
-            }
+            TryRandomJumpscare();
+            randomTimer = randomInterval;
         }
     }
 
     void TryRandomJumpscare()
     {
-        float chance = monster.aggression * randomChance;
+        float chance = (monster != null) ? monster.aggression * randomChance : 0.3f;
+        
         if (Random.value < chance)
         {
-            if (debugMode)
-                Debug.Log("[JumpscareSpawner] Random jumpscare triggered.");
             StartCoroutine(SpawnRandomJumpscare());
-        }
-    }
-
-    void Try360Jumpscare()
-    {
-        float chance = monster.aggression * frontChance;
-        if (Random.value < chance)
-        {
-            if (debugMode)
-                Debug.Log("[JumpscareSpawner] 360 jumpscare triggered.");
-            StartCoroutine(Spawn360Jumpscare());
         }
     }
 
     IEnumerator SpawnRandomJumpscare()
     {
+        // 1. Tìm vị trí ngẫu nhiên
         Vector3 dir = Random.onUnitSphere;
         dir.y = 0;
         dir.Normalize();
-        Vector3 pos = player.position + dir * Random.Range(randomMinDist, randomMaxDist);
+        Vector3 pos = player.position + dir * Random.Range(minDist, maxDist);
 
+        // 2. Chiếu tia xuống đất để tìm mặt sàn
         if (Physics.Raycast(pos + Vector3.up * 10f, Vector3.down, out RaycastHit hit, 20f, groundMask))
-            pos = hit.point + Vector3.up * 0.5f;
-
-        GameObject go = CreateJumpscare(pos, Quaternion.LookRotation(player.position - pos), false);
-        if (go != null)
         {
-            yield return new WaitForSeconds(Random.Range(visibleDurationRange.x, visibleDurationRange.y));
-            Destroy(go);
-        }
-    }
-
-    IEnumerator Spawn360Jumpscare()
-    {
-        float randomAngle = Random.Range(0f, 360f);
-        Vector3 direction = new Vector3(Mathf.Cos(randomAngle * Mathf.Deg2Rad), 0, Mathf.Sin(randomAngle * Mathf.Deg2Rad));
-        Vector3 basePos = player.position + direction * Random.Range(frontMinDist, frontMaxDist);
-
-        Vector3 pos = basePos + Vector3.up * 3f;
-        if (Physics.Raycast(pos, Vector3.down, out RaycastHit groundHit, 6f, groundMask))
-            pos = groundHit.point;
-
-        pos.y = player.position.y + eyeHeightOffset;
-
-        if (Physics.CheckSphere(pos, clearRadius, obstacleMask))
-            pos += direction * clearRadius * 2f;
-
-        Quaternion rot = Quaternion.LookRotation((player.position + Vector3.up * eyeHeightOffset) - pos);
-
-        GameObject go = CreateJumpscare(pos, rot, true);
-        if (go != null)
-        {
-            yield return new WaitForSeconds(Random.Range(visibleDurationRange.x, visibleDurationRange.y));
-            Destroy(go);
-        }
-    }
-
-    GameObject CreateJumpscare(Vector3 position, Quaternion rotation, bool useSilhouette = false)
-    {
-        GameObject prefab = useSilhouette
-            ? silhouettePrefab
-            : (use3D && jumpscare3DPrefab != null ? jumpscare3DPrefab : silhouettePrefab);
-
-        if (prefab == null)
-        {
-            if (debugMode)
-                Debug.LogWarning("[JumpscareSpawner] No prefab assigned!");
-            return null;
+            // ✅ CỘNG THÊM OFFSET ĐỂ KHÔNG BỊ CHÌM
+            pos = hit.point + Vector3.up * spawnHeightOffset;
         }
 
-        GameObject go = Instantiate(prefab, position, rotation);
+        // 3. Xoay mặt về phía Player
+        Quaternion rot = Quaternion.LookRotation(player.position - pos);
+        // Giữ thẳng đứng (không nghiêng theo dốc)
+        rot = Quaternion.Euler(0, rot.eulerAngles.y, 0); 
 
-        Animator animator = go.GetComponentInChildren<Animator>();
-        if (animator != null && !string.IsNullOrEmpty(animatorTrigger))
-            animator.SetTrigger(animatorTrigger);
+        // 4. Sinh ra quái
+        if (monsterPrefab != null)
+        {
+            GameObject go = Instantiate(monsterPrefab, pos, rot);
 
-        if (scareSounds != null && scareSounds.Length > 0)
-            AudioSource.PlayClipAtPoint(scareSounds[Random.Range(0, scareSounds.Length)], position, 0.9f);
+            // Phát âm thanh
+            if (scareSounds != null && scareSounds.Length > 0)
+                AudioSource.PlayClipAtPoint(scareSounds[Random.Range(0, scareSounds.Length)], pos, 1f);
 
-        if (debugMode)
-            Debug.Log($"[JumpscareSpawner] Spawned: {go.name} at {position}");
-        return go;
+            // Tồn tại 4 giây rồi biến mất
+            yield return new WaitForSeconds(4f);
+            if (go != null) Destroy(go);
+        }
     }
-
-    public void TestRandomJumpscare() => StartCoroutine(SpawnRandomJumpscare());
-    public void Test360Jumpscare() => StartCoroutine(Spawn360Jumpscare());
 }
