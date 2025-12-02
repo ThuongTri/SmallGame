@@ -6210,7 +6210,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3752772928619106337, guid: 13027ef6b5b126e43bd477e4f79332fc, type: 3}
       propertyPath: searchDuration
-      value: 5
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 3752772928619106337, guid: 13027ef6b5b126e43bd477e4f79332fc, type: 3}
       propertyPath: jumpscareFaceSpeed

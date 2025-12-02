@@ -91,6 +91,7 @@ public class MonsterAI : MonoBehaviour
     {
         agent.speed = patrolSpeed;
         SetRandomDestination();
+
     }
 
     void Update()
