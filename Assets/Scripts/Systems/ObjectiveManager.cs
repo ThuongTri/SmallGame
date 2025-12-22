@@ -8,21 +8,18 @@ public class ObjectiveManager : MonoBehaviour
     private HashSet<string> collectedItems = new HashSet<string>();
 
     [Header("Assembled Map (Inventory)")]
-    [Tooltip("Sprite hiển thị khi map được ghép")]
+    [Tooltip("Sprite hiển thị khi map đã mở")]
     public Sprite assembledMapSprite;
-    [Tooltip("ID dùng để lưu assembled map vào Lore/Inventory")]
+    [Tooltip("ID dùng để lưu map vào Lore/Inventory")]
     public string assembledMapID = "assembled_map";
     [Tooltip("Title để show trong Codex/Inventory")]
-    public string assembledMapTitle = "Bản đồ hoàn chỉnh";
+    public string assembledMapTitle = "Bản đồ khu rừng";
 
     [Header("References for UI feedback")]
-    public GameObject toastPrefab; // small UI popup, optional
+    public GameObject toastPrefab; 
     public Transform toastParent;
 
-    [Header("Bunker door references")]
-    public GameObject bunkerDoor; // assign door object with Animator
-    public string openDoorAnimTrigger = "Unlock";
-
+    // Biến kiểm tra xem đã có map chưa
     private bool mapAssembled = false;
 
     void Awake()
@@ -39,17 +36,8 @@ public class ObjectiveManager : MonoBehaviour
         collectedItems.Add(itemID);
         Debug.Log($"[ObjectiveManager] Collected: {itemID}");
 
-        CheckMapAssembly();
-    }
-
-    private void CheckMapAssembly()
-    {
-        // count map pieces with prefix "map_"
-        int mapCount = 0;
-        foreach (var id in collectedItems)
-            if (id.StartsWith("map_")) mapCount++;
-
-        if (!mapAssembled && mapCount >= 3)
+        // Logic nhặt 1 cái là mở map luôn
+        if (!mapAssembled && itemID.StartsWith("map_"))
         {
             mapAssembled = true;
             OnAssembleMap();
@@ -58,44 +46,35 @@ public class ObjectiveManager : MonoBehaviour
 
     private void OnAssembleMap()
     {
-        Debug.Log("[ObjectiveManager] Map assembled!");
-        // 1) Thêm lore/entry nếu muốn (dùng LoreManager nếu bạn muốn)
+        Debug.Log("[ObjectiveManager] Map Unlocked!");
+
+        // 1. Thêm vào Lore/Inventory
         if (LoreManager.Instance != null)
         {
-            LoreManager.Instance.AddLore(assembledMapID, assembledMapTitle, "Một bản đồ ghép lại, đánh dấu vị trí bunker.", null);
+            LoreManager.Instance.AddLore(assembledMapID, assembledMapTitle, "Bản đồ chi tiết khu rừng. Nhấn 'M' để xem.", assembledMapSprite);
         }
 
-        // 2) Nếu bạn có InventoryManager, gọi nó để thêm item "assembled_map"
-        // Example (uncomment & chỉnh nếu bạn có InventoryManager):
-        // InventoryManager.Instance.AddItem(assembledMapID, assembledMapSprite, assembledMapTitle);
-
-        // 3) Nếu không có Inventory, ta có thể show toast + set một flag để MapUI truy cập
+        // 2. Hiện thông báo nhỏ
         if (toastPrefab != null && toastParent != null)
         {
             var go = Instantiate(toastPrefab, toastParent);
             var txt = go.GetComponentInChildren<UnityEngine.UI.Text>();
-            if (txt != null) txt.text = "Bạn đã ghép được bản đồ!";
+            // Nếu dùng TMP: var txt = go.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+            if (txt != null) txt.text = "Đã tìm thấy Bản Đồ! (Nhấn M)";
             Destroy(go, 3f);
         }
     }
 
-    // Kiểm tra có item
+    // Kiểm tra có item (để MapController gọi)
     public bool HasItem(string id)
     {
         return collectedItems.Contains(id) || (id == assembledMapID && mapAssembled);
     }
 
-    // Dùng để lấy sprite assembled map (MapUI sẽ gọi)
+    // ✅ HÀM NÀY VỪA BỊ THIẾU, GIỜ ĐÃ THÊM LẠI:
+    // MapUIController cần hàm này để lấy ảnh bản đồ hiển thị lên
     public Sprite GetAssembledMapSprite()
     {
         return mapAssembled ? assembledMapSprite : null;
-    }
-
-    // Optionally expose count
-    public int GetMapPieceCount()
-    {
-        int c = 0;
-        foreach (var id in collectedItems) if (id.StartsWith("map_")) c++;
-        return c;
     }
 }
