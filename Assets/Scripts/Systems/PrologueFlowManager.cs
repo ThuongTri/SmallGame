@@ -18,7 +18,9 @@ public class PrologueFlowManager : MonoBehaviour
     public bool reachedCamp = false;
     public int woodCollected = 0;
     public int requiredWood = 3;
-    public bool gotWater = false;
+
+    // Da nhom lua trai chua (bat buoc de duoc phep ngu neu ban muon)
+    public bool campfireLit = false;
 
     void Awake()
     {
@@ -28,7 +30,7 @@ public class PrologueFlowManager : MonoBehaviour
 
     public bool CanSleep()
     {
-        return reachedCamp && woodCollected >= requiredWood && gotWater;
+        return reachedCamp && woodCollected >= requiredWood && campfireLit;
     }
 
     public void MarkReachedCamp()
@@ -38,12 +40,12 @@ public class PrologueFlowManager : MonoBehaviour
 
     public void AddWood(int amount = 1)
     {
-        woodCollected += amount;
+        woodCollected += Mathf.Max(0, amount);
     }
 
-    public void MarkGotWater()
+    public void MarkCampfireLit()
     {
-        gotWater = true;
+        campfireLit = true;
     }
 
     public void SetPhase(Phase phase)

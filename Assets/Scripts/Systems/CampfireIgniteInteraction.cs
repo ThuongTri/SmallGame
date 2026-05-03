@@ -5,26 +5,26 @@ public class CampfireIgniteInteraction : MonoBehaviour, IInteractable
     [Header("References")]
     public PrologueFlowManager flowManager;
 
-    [Header("Fire Objects (bat/tat)")]
+    [Header("Fire Objects (bật/tắt)")]
     public GameObject[] fireVisuals;   // Particle/VFX object(s)
-    public Light fireLight;            // Den lua (neu co)
-    public AudioSource fireLoopAudio;  // Am lua chay loop (neu co)
+    public Light fireLight;            // Đèn lửa (nếu có)
+    public AudioSource fireLoopAudio;  // Âm thanh lửa loop (nếu có)
 
     [Header("Rule")]
     public int requiredWood = 3;
-    public bool consumeWood = false;   // true neu muon tru cui sau khi dot
+    public bool consumeWood = false;   // true nếu muốn trừ củi sau khi đốt
 
     [Header("Prompt")]
-    public string promptNotReady = "Can them cui de nhom lua";
-    public string promptReady = "Nhan E de nhom lua";
-    public string promptDone = "Lua trai dang chay";
+    public string promptNotReady = "Cần thêm củi để nhóm lửa";
+    public string promptReady = "Nhấn E để nhóm lửa";
+    public string promptDone = "Lửa trại đang cháy";
 
     private bool isLit = false;
 
     void Start()
     {
         if (flowManager == null) flowManager = PrologueFlowManager.Instance;
-        SetFireState(false); // Luon tat luc bat dau
+        SetFireState(false); // Luôn tắt lúc bắt đầu
     }
 
     public void OnInteract()
@@ -34,7 +34,7 @@ public class CampfireIgniteInteraction : MonoBehaviour, IInteractable
         if (flowManager == null)
         {
             if (UIMessageManager.Instance != null)
-                UIMessageManager.Instance.ShowMessage("Thieu PrologueFlowManager");
+                UIMessageManager.Instance.ShowMessage("Thiếu PrologueFlowManager trong scene.");
             return;
         }
 
@@ -42,17 +42,21 @@ public class CampfireIgniteInteraction : MonoBehaviour, IInteractable
         {
             int need = requiredWood - flowManager.woodCollected;
             if (UIMessageManager.Instance != null)
-                UIMessageManager.Instance.ShowMessage($"Can them {need} cui");
+                UIMessageManager.Instance.ShowMessage($"Cần thêm {need} cui.");
             return;
         }
 
-        // Du cui -> nhom lua
+        // Đủ củi -> nhóm lửa
         if (consumeWood) flowManager.woodCollected -= requiredWood;
+
         isLit = true;
         SetFireState(true);
 
+        // Quan trọng: báo cho PrologueFlowManager biết lửa đã cháy (để CanSleep() pass)
+        flowManager.MarkCampfireLit();
+
         if (UIMessageManager.Instance != null)
-            UIMessageManager.Instance.ShowMessage("Ban da nhom lua trai");
+            UIMessageManager.Instance.ShowMessage("Bạn đã nhóm lửa trại.");
     }
 
     public string GetInteractionPrompt()

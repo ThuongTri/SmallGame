@@ -1,18 +1,15 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class NewBehaviourScript : MonoBehaviour
+public class CampReachTrigger : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    [Tooltip("Neu Player khong co tag Player thi bo tick va dung layer check")]
+    public bool requirePlayerTag = true;
 
-    // Update is called once per frame
-    void Update()
+    void OnTriggerEnter(Collider other)
     {
-        
+        if (requirePlayerTag && !other.CompareTag("Player")) return;
+
+        if (PrologueFlowManager.Instance != null)
+            PrologueFlowManager.Instance.MarkReachedCamp();
     }
 }
