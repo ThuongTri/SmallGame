@@ -42,13 +42,27 @@ public Vector3 sunEuler = new Vector3(50f, 30f, 0f);
     [Header("Boot")]
     public bool applyDayOnStart = true;
 
+    [Header("Force light toggle by name")]
+    [Tooltip("When ApplyNight() is called, any Light whose name contains these tokens will be disabled.")]
+    public string[] nightForceDisableNameContains = new string[] { "sun_day", "sun day" };
+    [Tooltip("Optional explicit lights to force OFF at night.")]
+    public Light[] nightForceDisableLights;
+
     void Start()
     {
         if (applyDayOnStart) Apply(day);
     }
 
-    public void ApplyDay() => Apply(day);
-    public void ApplyNight() => Apply(night);
+    public void ApplyDay()
+    {
+        Apply(day);
+    }
+
+    public void ApplyNight()
+    {
+        Apply(night);
+        ForceDisableNightLights();
+    }
 
     public void Apply(EnvPreset p)
     {
@@ -90,6 +104,40 @@ public Vector3 sunEuler = new Vector3(50f, 30f, 0f);
         if (objs == null) return;
         for (int i = 0; i < objs.Length; i++)
             if (objs[i] != null) objs[i].SetActive(on);
+    }
+
+    void ForceDisableNightLights()
+    {
+        if (nightForceDisableLights != null)
+        {
+            for (int i = 0; i < nightForceDisableLights.Length; i++)
+            {
+                if (nightForceDisableLights[i] != null)
+                    nightForceDisableLights[i].enabled = false;
+            }
+        }
+
+        if (nightForceDisableNameContains == null || nightForceDisableNameContains.Length == 0)
+            return;
+
+        Light[] allLights = FindObjectsOfType<Light>(true);
+        for (int i = 0; i < allLights.Length; i++)
+        {
+            Light l = allLights[i];
+            if (l == null) continue;
+
+            string n = l.name.ToLowerInvariant();
+            for (int k = 0; k < nightForceDisableNameContains.Length; k++)
+            {
+                string token = nightForceDisableNameContains[k];
+                if (string.IsNullOrWhiteSpace(token)) continue;
+                if (n.Contains(token.ToLowerInvariant()))
+                {
+                    l.enabled = false;
+                    break;
+                }
+            }
+        }
     }
 
 #if UNITY_EDITOR

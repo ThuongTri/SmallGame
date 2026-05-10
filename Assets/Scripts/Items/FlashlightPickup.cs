@@ -5,10 +5,15 @@ public class FlashlightPickup : MonoBehaviour, IInteractable
 {
     public GameObject playerFlashlight; 
     public TextMeshProUGUI flashlightText;
+    [Header("Rule")]
+    public bool allowPickupOnlyAtNight = true;
+    public string dayBlockMessage = "Ban ngay chua the nhat den pin.";
 
     // 🔹 Interface yêu cầu hàm này
     public string GetInteractionPrompt()
     {
+        if (!CanPickupNow())
+            return "Ban ngay khong the nhat den pin";
         return "Nhấn E để nhặt đèn pin";
     }
 
@@ -21,6 +26,13 @@ public class FlashlightPickup : MonoBehaviour, IInteractable
     // 🔹 Hàm gốc của bạn (giữ nguyên)
     public void OnInteract()
     {
+        if (!CanPickupNow())
+        {
+            if (UIMessageManager.Instance != null)
+                UIMessageManager.Instance.ShowMessage(dayBlockMessage);
+            return;
+        }
+
         if (playerFlashlight != null)
         {
             var playerFlashlightScript = playerFlashlight.GetComponent<PlayerFlashlight>();
@@ -38,7 +50,17 @@ public class FlashlightPickup : MonoBehaviour, IInteractable
             flashlightText.gameObject.SetActive(true);
         }
 
+        if (ObjectiveManager.Instance != null)
+            ObjectiveManager.Instance.OnItemCollected("flashlight");
+
         StartCoroutine(PickupSequence());
+    }
+
+    bool CanPickupNow()
+    {
+        if (!allowPickupOnlyAtNight) return true;
+        if (PrologueFlowManager.Instance == null) return true;
+        return PrologueFlowManager.Instance.currentPhase == PrologueFlowManager.Phase.NightmareNight;
     }
 
     private System.Collections.IEnumerator PickupSequence()

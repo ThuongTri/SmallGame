@@ -4,6 +4,8 @@ public class MapController : MonoBehaviour
 {
     [Header("Giao diện")]
     public GameObject mapPanel; // Kéo cái MapPanel vào đây
+    [Tooltip("Giữ OFF nếu đã dùng MapUIController để tránh bấm M bị toggle 2 lần.")]
+    public bool listenInput = false;
 
     [Header("Điều kiện")]
     // ID của bản đồ sau khi ghép xong (phải khớp với ID trong ObjectiveManager)
@@ -11,6 +13,7 @@ public class MapController : MonoBehaviour
 
     void Update()
     {
+        if (!listenInput) return;
         // Kiểm tra nếu người chơi ấn phím M
         if (Input.GetKeyDown(KeyCode.M))
         {
@@ -20,6 +23,12 @@ public class MapController : MonoBehaviour
 
     void ToggleMap()
     {
+        if (MapUIController.Instance != null)
+        {
+            MapUIController.Instance.ToggleMap();
+            return;
+        }
+
         // 1. Kiểm tra xem ObjectiveManager đã có bản đồ ghép chưa
         // (Hàm HasItem này bạn đã có trong ObjectiveManager rồi)
         if (ObjectiveManager.Instance != null && ObjectiveManager.Instance.HasItem(assembledMapID))

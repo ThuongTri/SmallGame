@@ -15,7 +15,8 @@ public class PrologueFlowManager : MonoBehaviour
     public Phase currentPhase = Phase.PrologueDay;
 
     [Header("Day Tasks")]
-    public bool reachedCamp = false;
+    [Tooltip("Legacy flag. Không còn dùng để chặn ngủ (luôn coi như đã tới trại).")]
+    public bool reachedCamp = true;
     public int woodCollected = 0;
     public int requiredWood = 3;
 
@@ -28,9 +29,14 @@ public class PrologueFlowManager : MonoBehaviour
         else Destroy(gameObject);
     }
 
+    void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
+    }
+
     public bool CanSleep()
     {
-        return reachedCamp && woodCollected >= requiredWood && campfireLit;
+        return woodCollected >= requiredWood && campfireLit;
     }
 
     public void MarkReachedCamp()
@@ -51,5 +57,13 @@ public class PrologueFlowManager : MonoBehaviour
     public void SetPhase(Phase phase)
     {
         currentPhase = phase;
+    }
+
+    public void ResetForNewRun()
+    {
+        currentPhase = Phase.PrologueDay;
+        reachedCamp = true;
+        campfireLit = false;
+        woodCollected = 0;
     }
 }

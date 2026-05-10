@@ -7,6 +7,7 @@ public class PlayerNoiseEmitter : MonoBehaviour
     public float noiseRadius = 5f;
     public float noiseInterval = 2f;
     public LayerMask monsterLayer;
+    public bool debugNoiseLogs = false;
 
     private float noiseTimer;
 
@@ -41,10 +42,7 @@ public class PlayerNoiseEmitter : MonoBehaviour
             }
         }
 
-        // Ví dụ: random 1 giá trị float và int
-        float value = UnityEngine.Random.Range(0f, 1f);
-        int number = UnityEngine.Random.Range(0, 10);
-
-        Debug.Log("Noise emitted. Random float: " + value + " | Random int: " + number);
+        if (debugNoiseLogs)
+            Debug.Log("Noise emitted at " + noisePosition);
     }
 }

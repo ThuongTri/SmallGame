@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
@@ -33,11 +34,15 @@ public class PlayerController : MonoBehaviour
 
     // === BIẾN MỚI ĐỂ KHÓA INPUT ===
     private bool isInputLocked = false; 
+    private bool isMovementLocked = false;
+    private float cutsceneLookScale = 1f;
     // =============================
 
     // Sprint reporting state
     private bool wasSprinting = false;
     private float sprintAccumulatedSeconds = 0f;
+    Coroutine panicRoutine;
+    float externalSpeedMultiplier = 1f;
 
     void Start()
     {
@@ -59,7 +64,7 @@ public class PlayerController : MonoBehaviour
     void Move()
     {
         // === CHECK KHÓA INPUT ===
-        if (isInputLocked) return; 
+        if (isInputLocked || isMovementLocked) return; 
         // ========================
 
         float moveX = Input.GetAxis("Horizontal"); 
@@ -113,6 +118,7 @@ public class PlayerController : MonoBehaviour
         wasSprinting = isSprinting;
 
         float currentSpeed = (wantsToRun && !exhausted) ? runSpeed : walkSpeed;
+        currentSpeed *= Mathf.Max(0.2f, externalSpeedMultiplier);
 
         Vector3 move = transform.right * moveX + transform.forward * moveZ;
 
@@ -150,6 +156,8 @@ public class PlayerController : MonoBehaviour
 
         float mouseX = Input.GetAxis("Mouse X") * lookSensitivity;
         float mouseY = Input.GetAxis("Mouse Y") * lookSensitivity;
+        mouseX *= cutsceneLookScale;
+        mouseY *= cutsceneLookScale;
 
         transform.Rotate(Vector3.up * mouseX);
 
@@ -179,6 +187,49 @@ public class PlayerController : MonoBehaviour
         return stamina / maxStamina;
     }
 
+    public void PanicDrainStamina(float seconds, float drainPerSecond, bool forceBreathingLoop = true)
+    {
+        if (panicRoutine != null) StopCoroutine(panicRoutine);
+        panicRoutine = StartCoroutine(PanicDrainRoutine(seconds, drainPerSecond, forceBreathingLoop));
+    }
+
+    IEnumerator PanicDrainRoutine(float seconds, float drainPerSecond, bool forceBreathingLoop)
+    {
+        float t = 0f;
+        while (t < seconds)
+        {
+            t += Time.deltaTime;
+            stamina -= Mathf.Max(0f, drainPerSecond) * Time.deltaTime;
+            if (stamina <= 0f)
+            {
+                stamina = 0f;
+                exhausted = true;
+            }
+
+            if (forceBreathingLoop && breathingAudio != null && heavyBreathing != null)
+            {
+                if (!breathingAudio.isPlaying)
+                {
+                    breathingAudio.clip = heavyBreathing;
+                    breathingAudio.loop = true;
+                    breathingAudio.Play();
+                }
+            }
+
+            yield return null;
+        }
+
+        if (breathingAudio != null)
+        {
+            breathingAudio.loop = false;
+            // Let natural exhaustion logic continue if still exhausted
+            if (!exhausted && breathingAudio.isPlaying && breathingAudio.clip == heavyBreathing)
+                breathingAudio.Stop();
+        }
+
+        panicRoutine = null;
+    }
+
     // =======================================================
     // === CÁC HÀM MỚI DÙNG CHO CUTSCENE (SIGNAL RECEIVER) ===
     // =======================================================
@@ -205,5 +256,25 @@ public class PlayerController : MonoBehaviour
         // Khóa con trỏ chuột lại cho gameplay
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+    }
+
+    public void LockMovementOnly()
+    {
+        isMovementLocked = true;
+    }
+
+    public void UnlockMovementOnly()
+    {
+        isMovementLocked = false;
+    }
+
+    public void SetCutsceneLookScale(float scale01)
+    {
+        cutsceneLookScale = Mathf.Clamp(scale01, 0f, 1f);
+    }
+
+    public void SetExternalSpeedMultiplier(float multiplier)
+    {
+        externalSpeedMultiplier = Mathf.Clamp(multiplier, 0.2f, 2.5f);
     }
 }

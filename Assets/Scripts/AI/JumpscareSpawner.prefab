@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2997079608787172853}
   - component: {fileID: 2220203217255115471}
-  - component: {fileID: 723930039058006761}
   m_Layer: 0
   m_Name: JumpscareSpawner
   m_TagString: Untagged
@@ -45,23 +44,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c9042d7d10d3a749890cc5ad0e00c5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  silhouettePrefab: {fileID: 0}
+  monsterPrefab: {fileID: 6136463610411225892, guid: 8031e987f727a8b4887f778d0ec5fccd, type: 3}
+  minDist: 12
+  maxDist: 22
+  spawnHeightOffset: 0
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  groundRayUp: 50
+  groundRayDown: 220
+  snapToNavMesh: 1
+  navMeshSnapDistance: 4
+  surfaceFootClearance: 0.12
+  peripheralSpawnWeight: 0.55
+  peripheralYawMin: 35
+  peripheralYawMax: 85
+  centerYawMax: 18
+  intervalRange: {x: 2, y: 5}
+  autoDespawnRange: {x: 2.8, y: 5.2}
+  vanishDistance: 12
+  instantVanishChance: 0.5
+  fadeDuration: 3.24
   scareSounds:
-  - {fileID: 8300000, guid: 7131d701ae015a54aa3d856feccd513f, type: 3}
+  - {fileID: 8300000, guid: d6931c03edef5674d9b489deef861158, type: 3}
+  - {fileID: 8300000, guid: 99131ed7414d3ea42a90a57093e2e3e7, type: 3}
+  - {fileID: 8300000, guid: b37220c9b2de9714c9f5b195a68d7678, type: 3}
+  scareSoundChance: 0.65
   player: {fileID: 0}
-  minDist: 5.93
-  maxDist: 14
   monster: {fileID: 0}
---- !u!114 &723930039058006761
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4587085436906166759}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3e0ca31091014d541a206d1d7289357a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  spawner: {fileID: 2220203217255115471}
+  playerCamera: {fileID: 0}
+  keepFacingPlayer: 1
+  faceTurnSpeed: 6
+  freezeAnimatorRootMotionInDay: 1
+  nightRunSpeed: 56
+  nightStopDistance: 0.5
+  nightDespawnDelay: 0.1
+  nightGhostPassThrough: 1
+  gateByProloguePhase: 0

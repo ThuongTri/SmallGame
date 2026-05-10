@@ -4,6 +4,9 @@ using TMPro; // Cần cái này để chỉnh sửa chữ
 
 public class MainMenuController : MonoBehaviour
 {
+    const string StartedFromMenuKey = "StartedFromMenu";
+    const string StartedFromMenuAtUtcTicksKey = "StartedFromMenuAtUtcTicks";
+
     [Header("UI References")]
     public TextMeshProUGUI difficultyText; // Kéo cái chữ bên trong nút Độ khó vào đây
 
@@ -12,6 +15,11 @@ public class MainMenuController : MonoBehaviour
 
     void Start()
     {
+        Time.timeScale = 1f;
+        AudioListener.pause = false;
+        AudioListener.volume = 1f;
+        EnsureMenuCamera();
+
         // Hiện chuột để bấm menu (quan trọng vì trong game bạn đã khóa chuột)
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
@@ -21,11 +29,37 @@ public class MainMenuController : MonoBehaviour
         UpdateDifficultyText();
     }
 
+    void EnsureMenuCamera()
+    {
+        Camera[] cams = FindObjectsOfType<Camera>(true);
+        bool hasEnabledCamera = false;
+        for (int i = 0; i < cams.Length; i++)
+        {
+            if (cams[i] != null && cams[i].enabled && cams[i].gameObject.activeInHierarchy)
+            {
+                hasEnabledCamera = true;
+                break;
+            }
+        }
+        if (hasEnabledCamera) return;
+
+        GameObject camGO = new GameObject("RuntimeMenuCamera");
+        Camera cam = camGO.AddComponent<Camera>();
+        cam.clearFlags = CameraClearFlags.SolidColor;
+        cam.backgroundColor = Color.black;
+        cam.orthographic = false;
+        camGO.transform.position = new Vector3(0f, 1.6f, -8f);
+        camGO.transform.rotation = Quaternion.identity;
+        camGO.AddComponent<AudioListener>();
+    }
+
     // === HÀM CHO NÚT START ===
     public void OnClickStart()
     {
         // Lưu độ khó lại trước khi chuyển cảnh
         PlayerPrefs.SetInt("Difficulty", currentDifficulty);
+        PlayerPrefs.SetInt(StartedFromMenuKey, 1);
+        PlayerPrefs.SetString(StartedFromMenuAtUtcTicksKey, System.DateTime.UtcNow.Ticks.ToString());
         PlayerPrefs.Save();
 
         // Load scene game (đảm bảo tên scene đúng y hệt)
@@ -55,6 +89,7 @@ public class MainMenuController : MonoBehaviour
     // Cập nhật chữ hiển thị
     void UpdateDifficultyText()
     {
+        if (difficultyText == null) return;
         switch (currentDifficulty)
         {
             case 0: difficultyText.text = "ĐỘ KHÓ: DỄ"; break;

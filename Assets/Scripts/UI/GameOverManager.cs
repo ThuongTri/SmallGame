@@ -30,6 +30,23 @@ public class GameOverManager : MonoBehaviour
         StartCoroutine(FadeInGameOver());
     }
 
+    /// <summary>
+    /// Sau cinematic capture đã fade đen; hiển thị Game Over ngay không chờ thêm.
+    /// </summary>
+    public void ShowGameOverAfterCapture()
+    {
+        StopAllCoroutines();
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        if (gameOverGroup != null)
+        {
+            gameOverGroup.alpha = 1f;
+            gameOverGroup.interactable = true;
+            gameOverGroup.blocksRaycasts = true;
+        }
+    }
+
     IEnumerator FadeInGameOver()
     {
         // Chờ 1 chút để quái hù xong đã

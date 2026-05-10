@@ -2,17 +2,26 @@ using UnityEngine;
 
 public class InventoryToggle : MonoBehaviour
 {
+    [Header("System switch")]
+    public bool disableInventorySystem = true;
     public GameObject inventoryPanel;
     public CodexUI codexUI;
     public string playerObjectName = "Player";
-    public MonoBehaviour playerControllerComponent;
+    public PlayerController playerControllerComponent;
+    public MapUIController mapUIController;
 
-    private MonoBehaviour cachedPlayerController;
+    private PlayerController cachedPlayerController;
 
     void Start()
     {
         if (inventoryPanel != null) inventoryPanel.SetActive(false);
         if (codexUI != null) codexUI.HideTooltip();
+
+        if (disableInventorySystem)
+        {
+            enabled = false; // Tắt hẳn hệ kho đồ theo yêu cầu.
+            return;
+        }
 
         if (playerControllerComponent != null)
         {
@@ -23,10 +32,13 @@ public class InventoryToggle : MonoBehaviour
             var playerObj = GameObject.Find(playerObjectName);
             if (playerObj != null)
             {
-                var comp = playerObj.GetComponent<MonoBehaviour>();
+                var comp = playerObj.GetComponent<PlayerController>();
                 if (comp != null) cachedPlayerController = comp;
             }
         }
+
+        if (mapUIController == null)
+            mapUIController = FindObjectOfType<MapUIController>(true);
 
         LockCursor(true);
     }
@@ -40,8 +52,14 @@ public class InventoryToggle : MonoBehaviour
     public void ToggleInventory()
     {
         if (inventoryPanel == null) return;
+        if (EndingManager.Instance != null && EndingManager.Instance.IsShowingChoice) return;
 
         bool isOpen = !inventoryPanel.activeSelf;
+
+        // Avoid UI overlap causing broken cursor/control states.
+        if (isOpen && mapUIController != null && mapUIController.panel != null && mapUIController.panel.activeSelf)
+            mapUIController.ToggleMap();
+
         inventoryPanel.SetActive(isOpen);
 
         if (isOpen)
